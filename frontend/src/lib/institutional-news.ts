@@ -16,7 +16,7 @@ const emptyCollection: InstitutionalNewsCollection = {
 export async function getInstitutionalNews(): Promise<InstitutionalNewsCollection> {
   try {
     const response = await fetch(`${API_BASE_URL}/noticias`, {
-      next: { revalidate: 300, tags: ["institutional-news"] },
+      cache: "no-store",
       signal: AbortSignal.timeout(5000),
     });
 
@@ -39,7 +39,7 @@ export async function getInstitutionalNewsItem(
 ): Promise<InstitutionalNewsItem | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/noticias/${slug}`, {
-      next: { revalidate: 300, tags: [`institutional-news-${slug}`] },
+      cache: "no-store",
       signal: AbortSignal.timeout(5000),
     });
 

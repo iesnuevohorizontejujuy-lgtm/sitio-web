@@ -23,3 +23,10 @@ it('shows only a published news item by slug', function () {
     $this->getJson('/api/noticias/noticia-visible')->assertSuccessful();
     $this->getJson('/api/noticias/noticia-oculta')->assertNotFound();
 });
+
+it('allows the local frontend origin to read public news', function () {
+    $this->withHeader('Origin', 'http://127.0.0.1:3000')
+        ->getJson('/api/noticias')
+        ->assertSuccessful()
+        ->assertHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:3000');
+});
