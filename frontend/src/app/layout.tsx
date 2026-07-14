@@ -16,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "IESNH | Instituto de Educacion Superior Nuevo Horizonte",
-  description: "Instituto de Educacion Superior Nuevo Horizonte.",
-  keywords: "IESNH, Instituto de Educacion Superior Nuevo Horizonte, Jujuy, Argentina",
+  title: "IES Nuevo Horizonte | Educación Superior en Jujuy",
+  description: "Instituto de Educación Superior Nuevo Horizonte. Formación técnica y profesional en San Salvador de Jujuy.",
+  keywords: "IESNH, Instituto de Educación Superior Nuevo Horizonte, carreras, tecnicaturas, Jujuy, Argentina",
 };
 
 
@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es-AR" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

@@ -173,6 +173,7 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   }
 
   /* Armonía para todos los títulos del sitio */
@@ -218,5 +219,59 @@
     transform-origin: center;
     /* Asegura que crezca desde el medio */
     animation: expand-line 3.5s ease-in-out infinite;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.institutional-shell {
+  color-scheme: light;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.institutional-shell h1,
+.institutional-shell h2,
+.institutional-shell h3,
+.institutional-shell h4 {
+  text-shadow: none;
+}
+
+.institutional-shell :focus-visible {
+  outline: 3px solid color-mix(in srgb, #2CBEE7 70%, white);
+  outline-offset: 3px;
+}
+
+.career-rich-text p + p,
+.career-rich-text ul,
+.career-rich-text ol {
+  margin-top: 1rem;
+}
+
+.career-rich-text ul,
+.career-rich-text ol {
+  padding-left: 1.25rem;
+}
+
+.career-rich-text ul {
+  list-style: disc;
+}
+
+.career-rich-text ol {
+  list-style: decimal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

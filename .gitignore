@@ -25,6 +25,7 @@ auth.json
 # Configuración local de editores y agentes
 .agents/
 .codex/
+.tmp-stitch-reference/
 **/.vscode/
 **/.idea/
 **/.cursor/
@@ -34,4 +35,3 @@ auth.json
 Thumbs.db
 *.log
 *.tsbuildinfo
-
