@@ -37,6 +37,7 @@ const normalizeCareer = (raw: ApiCareer, fallback: Career): Career => {
     capabilities:
       raw.capabilities ?? raw.capacidades ?? fallback.capabilities,
     employment: raw.employment ?? raw.salida_laboral ?? fallback.employment,
+    gallery: Array.isArray(raw.gallery) ? raw.gallery : fallback.gallery,
   };
 };
 

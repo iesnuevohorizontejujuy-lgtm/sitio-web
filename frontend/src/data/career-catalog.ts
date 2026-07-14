@@ -13,6 +13,7 @@ const common = {
   subjects: [],
   capabilities: [],
   employment: [],
+  gallery: [],
 } satisfies Omit<Career, "title" | "slug" | "area" | "description">;
 
 const descriptions = {

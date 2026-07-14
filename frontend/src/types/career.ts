@@ -10,6 +10,13 @@ export interface CareerSubject {
   year: number;
 }
 
+export interface CareerGalleryImage {
+  id: number | string;
+  url: string;
+  alt: string;
+  caption?: string | null;
+}
+
 export interface Career {
   id: number | null;
   title: string;
@@ -27,6 +34,7 @@ export interface Career {
   subjects: CareerSubject[];
   capabilities: string[];
   employment: string[];
+  gallery: CareerGalleryImage[];
 }
 
 export interface ApiCareer {
@@ -54,4 +62,5 @@ export interface ApiCareer {
   capacidades?: string[];
   employment?: string[];
   salida_laboral?: string[];
+  gallery?: CareerGalleryImage[];
 }

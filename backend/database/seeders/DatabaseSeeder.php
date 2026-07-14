@@ -15,11 +15,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $password = env('CMS_ADMIN_PASSWORD');
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        if (app()->isLocal() || filled($password)) {
+            User::updateOrCreate(
+                ['email' => env('CMS_ADMIN_EMAIL', 'admin@example.com')],
+                [
+                    'name' => env('CMS_ADMIN_NAME', 'Administrador IESNH'),
+                    'password' => $password ?: 'password',
+                    'is_admin' => true,
+                ],
+            );
+        }
+
+        $this->call(CarreraSeeder::class);
     }
 }

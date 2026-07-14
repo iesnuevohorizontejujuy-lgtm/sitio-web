@@ -14,7 +14,8 @@ import {
   UsersRound,
 } from "lucide-react";
 import { StudyPlan } from "@/components/institutional/StudyPlan";
-import { whatsappHref } from "@/config/institution";
+import { CareerGallery } from "@/components/institutional/CareerGallery";
+import { CareerInquiryForm } from "@/components/institutional/CareerInquiryForm";
 import { getCareer } from "@/lib/careers";
 import type { CareerArea } from "@/types/career";
 
@@ -43,8 +44,6 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
   if (!career) notFound();
 
   const shortTitle = career.title.replace("Tecnicatura Superior en ", "");
-  const enrollmentMessage = `Hola, quiero recibir información para inscribirme en ${career.title}.`;
-  const consultationMessage = `Hola, quiero hacer una consulta sobre ${career.title}.`;
 
   return (
     <main className="institutional-shell bg-[#F8FAFD] text-[#121C28]">
@@ -66,12 +65,12 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
             <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-[-0.035em] text-[#0A496C] sm:text-5xl">{career.title}</h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-[#52606D]">{career.description}</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a href={whatsappHref(enrollmentMessage)} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#0A496C] px-6 py-3 text-sm font-semibold text-white hover:bg-[#073A57]">Quiero inscribirme</a>
-              <a href={whatsappHref(consultationMessage)} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-[#0A496C] px-6 py-3 text-sm font-semibold text-[#0A496C] hover:bg-[#E0ECF8]">Hacer una consulta</a>
+              <a href="#consulta" className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#0A496C] px-6 py-3 text-sm font-semibold text-white hover:bg-[#073A57]">Quiero inscribirme</a>
+              <a href="#consulta" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-[#0A496C] px-6 py-3 text-sm font-semibold text-[#0A496C] hover:bg-[#E0ECF8]">Hacer una consulta</a>
             </div>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#CBD5E1] bg-[#E0ECF8] lg:col-span-6">
-            <Image src={areaImages[career.area]} alt={`Estudiantes de ${shortTitle}`} fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+            <Image src={career.image ?? areaImages[career.area]} alt={`Estudiantes de ${shortTitle}`} fill priority unoptimized={Boolean(career.image)} sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
           </div>
         </div>
       </section>
@@ -141,6 +140,16 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
         </div>
       </section>
 
+      {career.gallery.length > 0 && (
+        <section className="border-y border-[#D8E1E8] bg-[#F7F9FB] py-20">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Experiencias de la carrera</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Estudiantes y actividades</h2>
+            <div className="mt-10"><CareerGallery images={career.gallery} /></div>
+          </div>
+        </section>
+      )}
+
       <section className="bg-white py-20">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-12 lg:px-8">
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#CBD5E1] lg:col-span-5"><Image src="/instituto.jpg" alt="Instalaciones del IES Nuevo Horizonte" fill sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover" /></div>
@@ -156,12 +165,16 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
         </div>
       </section>
 
-      <section className="bg-[#073A57] px-5 py-16 text-center text-white lg:px-8">
-        <h2 className="text-3xl font-semibold tracking-[-0.025em]">Empezá tu camino en {shortTitle}</h2>
-        <p className="mx-auto mt-4 max-w-2xl leading-7 text-white/75">Nuestro equipo puede orientarte sobre requisitos, documentación y próximos pasos.</p>
-        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <a href={whatsappHref(enrollmentMessage)} target="_blank" rel="noreferrer" className="rounded-lg bg-[#2CBEE7] px-6 py-3 text-sm font-semibold text-[#073A57] hover:bg-white">Quiero inscribirme</a>
-          <a href={whatsappHref(consultationMessage)} target="_blank" rel="noreferrer" className="rounded-lg border border-white/40 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10">Hablar con un asesor</a>
+      <section id="consulta" className="scroll-mt-28 bg-[#E0ECF8] px-5 py-16 lg:px-8 lg:py-20">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]">Contacto</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C]">Consultá por {shortTitle}</h2>
+            <p className="mt-5 leading-7 text-[#52606D]">Dejanos tus datos y la consulta llegará al equipo del instituto. Podrán responderte directamente por WhatsApp.</p>
+          </div>
+          <div className="rounded-2xl bg-white p-6 md:p-9 lg:col-span-8">
+            <CareerInquiryForm careerId={career.id} careerTitle={career.title} />
+          </div>
         </div>
       </section>
     </main>
