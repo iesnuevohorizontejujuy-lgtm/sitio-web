@@ -1,0 +1,37 @@
+# Dependencias y artefactos generados
+**/node_modules/
+**/vendor/
+**/.next/
+**/out/
+**/build/
+**/coverage/
+
+# Configuración local y secretos
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+*.pem
+auth.json
+
+# Datos locales y archivos de ejecución
+**/database/*.sqlite
+**/storage/logs/
+**/storage/framework/
+**/storage/*.key
+**/public/storage/
+**/public/hot
+
+# Configuración local de editores y agentes
+.agents/
+.codex/
+**/.vscode/
+**/.idea/
+**/.cursor/
+
+# Sistema y registros
+.DS_Store
+Thumbs.db
+*.log
+*.tsbuildinfo
+
