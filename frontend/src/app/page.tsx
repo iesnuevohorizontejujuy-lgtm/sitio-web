@@ -8,11 +8,16 @@ import {
   UsersRound,
 } from "lucide-react";
 import { CareerCard } from "@/components/institutional/CareerCard";
+import { InstitutionalNewsCard } from "@/components/institutional/InstitutionalNewsCard";
 import { whatsappHref } from "@/config/institution";
 import { getCareers } from "@/lib/careers";
+import { getInstitutionalNews } from "@/lib/institutional-news";
 
 export default async function HomePage() {
-  const careers = await getCareers();
+  const [careers, institutionalNews] = await Promise.all([
+    getCareers(),
+    getInstitutionalNews(),
+  ]);
   const featuredSlugs = [
     "desarrollo-de-software",
     "enfermeria",
@@ -22,6 +27,12 @@ export default async function HomePage() {
   const featuredCareers = featuredSlugs
     .map((slug) => careers.find((career) => career.slug === slug))
     .filter((career) => career !== undefined);
+  const latestInstitutionalNews = [
+    ...institutionalNews.generales,
+    ...institutionalNews.fechas_importantes,
+  ]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 3);
 
   return (
     <main className="institutional-shell bg-white text-[#121C28]">
@@ -116,21 +127,18 @@ export default async function HomePage() {
           <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]"><span className="h-0.5 w-8 bg-[#0A496C]" />Comunidad</p>
           <div className="mt-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <h2 className="text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Vida institucional</h2>
-            <Link href="/noticias" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C]">Ver todas las novedades <ArrowRight className="size-4" /></Link>
+            <Link href="/vida-institucional" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C]">Ver todas las novedades <ArrowRight className="size-4" /></Link>
           </div>
-          <div className="mt-10 grid gap-8 md:grid-cols-3">
-            {[
-              { image: "/institutional/students-collaboration.png", title: "Noticias y comunicados", text: "Información académica y novedades de nuestra comunidad." },
-              { image: "/institutional/professor-classroom.png", title: "Aprender acompañados", text: "Docentes y estudiantes construyendo conocimiento en conjunto." },
-              { image: "/institutional/software-students.png", title: "Prácticas que acercan al futuro", text: "Experiencias formativas conectadas con el mundo profesional." },
-            ].map((item) => (
-              <Link key={item.title} href="/noticias" className="group">
-                <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-[#CBD5E1]"><Image src={item.image} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" /></div>
-                <h3 className="mt-5 text-xl font-semibold text-[#0A496C] group-hover:underline">{item.title}</h3>
-                <p className="mt-2 leading-6 text-[#52606D]">{item.text}</p>
-              </Link>
-            ))}
-          </div>
+          {latestInstitutionalNews.length > 0 ? (
+            <div className="mt-10 grid gap-8 md:grid-cols-3">
+              {latestInstitutionalNews.map((item) => <InstitutionalNewsCard key={item.id} item={item} />)}
+            </div>
+          ) : (
+            <Link href="/vida-institucional" className="mt-10 flex items-center justify-between gap-6 border-l-4 border-[#2CBEE7] bg-[#F7F9FB] p-7 text-[#52606D]">
+              <span>Las próximas noticias y actividades cargadas desde el panel institucional aparecerán acá.</span>
+              <ArrowRight className="size-5 shrink-0 text-[#0A496C]" />
+            </Link>
+          )}
         </div>
       </section>
 
