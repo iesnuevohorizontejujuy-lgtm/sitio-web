@@ -5,6 +5,8 @@ import {
   ArrowRight,
   BookOpenCheck,
   Building2,
+  BusFront,
+  ExternalLink,
   GraduationCap,
   HeartHandshake,
   MapPin,
@@ -116,7 +118,66 @@ export default function InstitutionPage() {
         </div>
       </section>
 
-      <section className="px-5 py-20 lg:px-8">
+      <section className="py-20 md:py-24">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <MotionReveal className="mb-10 max-w-3xl">
+            <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]"><span className="h-0.5 w-8 bg-[#2CBEE7]" />Cómo llegar</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Encontranos en Alto Comedero</h2>
+            <p className="mt-5 text-lg leading-8 text-[#52606D]">El instituto se encuentra en barrio 47 Hectáreas, con acceso mediante distintas líneas de transporte urbano.</p>
+          </MotionReveal>
+
+          <div className="grid overflow-hidden rounded-2xl border border-[#B7CADB] bg-white lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.8fr)]">
+            <MotionReveal className="relative min-h-[430px] bg-[#E0ECF8]">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3637.229497413698!2d-65.23556002479582!3d-24.268713378320264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x941b077739c761db%3A0x4dbcb07ad6517b37!2sInstituto%20de%20Educaci%C3%B3n%20Superior%20%22Nuevo%20Horizonte%22!5e0!3m2!1ses-419!2sar!4v1784087207149!5m2!1ses-419!2sar"
+                title="Mapa del Instituto de Educación Superior Nuevo Horizonte"
+                className="absolute inset-0 h-full w-full border-0"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            </MotionReveal>
+
+            <MotionReveal className="flex flex-col p-7 md:p-9" delay={0.1}>
+              <div className="flex gap-4 border-b border-[#D8E1E8] pb-7">
+                <MapPin className="mt-1 size-6 shrink-0 text-[#0A496C]" />
+                <div>
+                  <h3 className="font-semibold text-[#0A496C]">Dirección</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#52606D]">{institution.address}, {institution.postalCode} {institution.city}</p>
+                </div>
+              </div>
+
+              <div className="pt-7">
+                <div className="flex items-center gap-3">
+                  <BusFront className="size-6 text-[#0A496C]" />
+                  <h3 className="font-semibold text-[#0A496C]">Colectivos que te acercan</h3>
+                </div>
+                <div className="mt-6 space-y-6">
+                  <div>
+                    <p className="text-sm font-semibold text-[#0A496C]">Empresa Santa Ana</p>
+                    <p className="mt-2 text-sm leading-6 text-[#52606D]">Líneas 52, 20 y 30</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#0A496C]">Empresa Urbano</p>
+                    <p className="mt-2 text-sm leading-6 text-[#52606D]">Línea 48 Interbarrial</p>
+                  </div>
+                </div>
+              </div>
+
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=-24.268713378320264,-65.23556002479582"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-9 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#0A496C] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#073A57]"
+              >
+                Ver indicaciones en Google Maps <ExternalLink className="size-4" />
+              </a>
+            </MotionReveal>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 pb-20 lg:px-8">
         <MotionReveal className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 rounded-2xl bg-[#0A496C] px-7 py-12 text-white md:flex-row md:items-center md:px-12">
           <div>
             <h2 className="text-3xl font-semibold tracking-[-0.025em]">¿Querés formar parte?</h2>
