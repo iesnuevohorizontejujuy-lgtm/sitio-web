@@ -8,6 +8,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { CareerCarousel } from "@/components/institutional/CareerCarousel";
+import { HeroMediaCarousel } from "@/components/institutional/HeroMediaCarousel";
 import { InstitutionalNewsCard } from "@/components/institutional/InstitutionalNewsCard";
 import { MotionReveal } from "@/components/institutional/MotionReveal";
 import { whatsappHref } from "@/config/institution";
@@ -55,16 +56,15 @@ export default async function HomePage() {
                 Cómo inscribirme
               </a>
             </div>
+            <div className="mt-9 grid grid-cols-3 gap-4 border-t border-[#D8E1E8] pt-6">
+              <div><p className="text-xl font-semibold text-[#0A496C]">20</p><p className="mt-1 text-xs leading-5 text-[#64748B]">Carreras</p></div>
+              <div><p className="text-sm font-semibold text-[#0A496C]">Oficiales</p><p className="mt-1 text-xs leading-5 text-[#64748B]">Títulos</p></div>
+              <div><p className="text-sm font-semibold text-[#0A496C]">Presencial</p><p className="mt-1 text-xs leading-5 text-[#64748B]">Modalidad</p></div>
+            </div>
           </MotionReveal>
 
           <MotionReveal className="relative lg:col-span-7" delay={0.12}>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#CBD5E1] bg-[#E0ECF8]">
-              <Image src="/instituto.jpg" alt="Sala de informática del IES Nuevo Horizonte" fill priority sizes="(max-width: 1024px) 100vw, 58vw" className="object-cover" />
-            </div>
-            <div className="absolute bottom-5 left-5 max-w-[230px] border-l-4 border-[#2CBEE7] bg-white p-5 shadow-[0_4px_20px_rgba(10,73,108,0.10)] sm:bottom-7 sm:left-7">
-              <p className="font-semibold text-[#0A496C]">Excelencia académica</p>
-              <p className="mt-1 text-sm leading-5 text-[#52606D]">Títulos oficiales con validez nacional.</p>
-            </div>
+            <HeroMediaCarousel />
           </MotionReveal>
         </div>
       </section>
