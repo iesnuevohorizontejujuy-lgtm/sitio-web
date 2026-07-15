@@ -14,30 +14,33 @@ const normalizeSubjects = (raw: ApiCareer): CareerSubject[] =>
     }))
     .filter((subject) => subject.name.length > 0 && subject.year > 0);
 
-const normalizeCareer = (raw: ApiCareer, fallback: Career): Career => {
-  const apiSubjects = normalizeSubjects(raw);
+const normalizeCareer = (raw: ApiCareer): Career | null => {
+  const title = raw.title ?? raw.nombre;
+  const slug = raw.slug;
+  const area = raw.area ?? raw.categoria;
+
+  if (!title || !slug || !area) return null;
 
   return {
-    ...fallback,
-    id: raw.id ?? fallback.id,
-    title: raw.title ?? raw.nombre ?? fallback.title,
-    slug: raw.slug ?? fallback.slug,
-    area: raw.area ?? raw.categoria ?? fallback.area,
-    description: raw.description ?? raw.descripcion ?? fallback.description,
-    content: raw.content ?? raw.contenido ?? fallback.content,
-    duration: raw.duracion ?? fallback.duration,
-    modality: raw.modalidad ?? fallback.modality,
-    resolutionCode:
-      raw.resolution_code ?? raw.resolucion_codigo ?? fallback.resolutionCode,
-    image: raw.image ?? fallback.image,
-    imageThumb: raw.image_thumb ?? fallback.imageThumb,
-    planStudyUrl: raw.plan_estudio ?? fallback.planStudyUrl,
-    resolutionUrl: raw.resolucion ?? fallback.resolutionUrl,
-    subjects: apiSubjects.length > 0 ? apiSubjects : fallback.subjects,
-    capabilities:
-      raw.capabilities ?? raw.capacidades ?? fallback.capabilities,
-    employment: raw.employment ?? raw.salida_laboral ?? fallback.employment,
-    gallery: Array.isArray(raw.gallery) ? raw.gallery : fallback.gallery,
+    id: raw.id ?? null,
+    title,
+    shortTitle: raw.short_title ?? null,
+    slug,
+    area,
+    description: raw.description ?? raw.descripcion ?? "",
+    content: raw.content ?? raw.contenido ?? null,
+    duration: raw.duracion ?? "Consultar",
+    modality: raw.modalidad ?? "Consultar",
+    resolutionCode: raw.resolution_code ?? raw.resolucion_codigo ?? null,
+    awardedTitle: raw.titulo_otorgado ?? null,
+    image: raw.image ?? null,
+    imageThumb: raw.image_thumb ?? null,
+    planStudyUrl: raw.plan_estudio ?? null,
+    resolutionUrl: raw.resolucion ?? null,
+    subjects: normalizeSubjects(raw),
+    capabilities: raw.capabilities ?? raw.capacidades ?? [],
+    employment: raw.employment ?? raw.salida_laboral ?? [],
+    gallery: Array.isArray(raw.gallery) ? raw.gallery : [],
   };
 };
 
@@ -65,20 +68,15 @@ const unwrapItem = (payload: unknown): ApiCareer | null => {
 export async function getCareers(): Promise<Career[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/carreras`, {
-      next: { revalidate: 3600, tags: ["careers"] },
+      cache: "no-store",
       signal: AbortSignal.timeout(5000),
     });
     if (!response.ok) return careerCatalog;
 
     const apiCareers = unwrapCollection(await response.json());
-    return careerCatalog.map((fallback) => {
-      const match = apiCareers.find(
-        (career) =>
-          career.slug === fallback.slug ||
-          (career.title ?? career.nombre) === fallback.title,
-      );
-      return match ? normalizeCareer(match, fallback) : fallback;
-    });
+    return apiCareers
+      .map(normalizeCareer)
+      .filter((career): career is Career => career !== null);
   } catch {
     return careerCatalog;
   }
@@ -86,17 +84,18 @@ export async function getCareers(): Promise<Career[]> {
 
 export async function getCareer(slug: string): Promise<Career | null> {
   const fallback = findCatalogCareer(slug);
-  if (!fallback) return null;
 
   try {
     const response = await fetch(`${API_BASE_URL}/carreras/${slug}`, {
-      next: { revalidate: 3600, tags: [`career-${slug}`] },
+      cache: "no-store",
       signal: AbortSignal.timeout(5000),
     });
-    if (!response.ok) return fallback;
+    if (response.status === 404) return null;
+    if (!response.ok) return fallback ?? null;
+
     const item = unwrapItem(await response.json());
-    return item ? normalizeCareer(item, fallback) : fallback;
+    return item ? normalizeCareer(item) : null;
   } catch {
-    return fallback;
+    return fallback ?? null;
   }
 }

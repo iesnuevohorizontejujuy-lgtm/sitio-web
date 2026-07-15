@@ -20,6 +20,7 @@ export interface CareerGalleryImage {
 export interface Career {
   id: number | null;
   title: string;
+  shortTitle?: string | null;
   slug: string;
   area: CareerArea;
   description: string;
@@ -27,6 +28,7 @@ export interface Career {
   duration: string;
   modality: string;
   resolutionCode?: string | null;
+  awardedTitle?: string | null;
   image?: string | null;
   imageThumb?: string | null;
   planStudyUrl?: string | null;
@@ -41,6 +43,7 @@ export interface ApiCareer {
   id?: number;
   title?: string;
   nombre?: string;
+  short_title?: string | null;
   slug?: string;
   area?: CareerArea;
   categoria?: CareerArea;
@@ -52,6 +55,7 @@ export interface ApiCareer {
   modalidad?: string;
   resolution_code?: string | null;
   resolucion_codigo?: string | null;
+  titulo_otorgado?: string | null;
   image?: string | null;
   image_thumb?: string | null;
   plan_estudio?: string | null;

@@ -43,7 +43,7 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
   const career = await getCareer(slug);
   if (!career) notFound();
 
-  const shortTitle = career.title.replace("Tecnicatura Superior en ", "");
+  const shortTitle = career.shortTitle || career.title.replace("Tecnicatura Superior en ", "");
 
   return (
     <main className="institutional-shell bg-[#F8FAFD] text-[#121C28]">
@@ -80,7 +80,7 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
           <AcademicDatum icon={Clock3} label="Duración" value={career.duration} />
           <AcademicDatum icon={MapPin} label="Modalidad" value={career.modality} />
           <AcademicDatum icon={FileText} label="Resolución" value={career.resolutionCode ?? "Consultar"} />
-          <AcademicDatum icon={GraduationCap} label="Título" value="Oficial" />
+          <AcademicDatum icon={GraduationCap} label="Título" value={career.awardedTitle || "Título oficial"} />
         </div>
       </section>
 
