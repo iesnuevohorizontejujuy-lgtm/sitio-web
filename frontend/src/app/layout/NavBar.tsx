@@ -9,7 +9,7 @@ import { institution, whatsappHref } from "@/config/institution";
 
 const navigation = [
   { label: "Inicio", href: "/" },
-  { label: "Institución", href: "/#institucion" },
+  { label: "Institución", href: "/institucion" },
   { label: "Carreras", href: "/carreras" },
   { label: "Vida institucional", href: "/vida-institucional" },
   { label: "Contacto", href: "/#contacto" },
@@ -51,6 +51,7 @@ export default function Navbar() {
             {navigation.map((item) => {
               const active =
                 (item.href === "/carreras" && pathname?.startsWith("/carreras")) ||
+                (item.href === "/institucion" && pathname?.startsWith("/institucion")) ||
                 (item.href === "/vida-institucional" && pathname?.startsWith("/vida-institucional"));
               return (
                 <Link key={item.href} href={item.href} className={`border-b-2 py-2 text-sm font-medium transition-colors ${active ? "border-[#0A496C] text-[#0A496C]" : "border-transparent text-[#52606D] hover:text-[#0A496C]"}`}>

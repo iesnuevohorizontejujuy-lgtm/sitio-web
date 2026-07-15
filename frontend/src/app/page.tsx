@@ -7,8 +7,9 @@ import {
   GraduationCap,
   UsersRound,
 } from "lucide-react";
-import { CareerCard } from "@/components/institutional/CareerCard";
+import { CareerCarousel } from "@/components/institutional/CareerCarousel";
 import { InstitutionalNewsCard } from "@/components/institutional/InstitutionalNewsCard";
+import { MotionReveal } from "@/components/institutional/MotionReveal";
 import { whatsappHref } from "@/config/institution";
 import { getCareers } from "@/lib/careers";
 import { getInstitutionalNews } from "@/lib/institutional-news";
@@ -38,7 +39,7 @@ export default async function HomePage() {
     <main className="institutional-shell bg-white text-[#121C28]">
       <section className="border-b border-[#D8E1E8]">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 md:py-20 lg:grid-cols-12 lg:px-8 lg:py-24">
-          <div className="lg:col-span-5">
+          <MotionReveal className="lg:col-span-5">
             <div className="mb-6 h-0.5 w-10 bg-[#2CBEE7]" />
             <h1 className="max-w-xl text-4xl font-bold leading-[1.08] tracking-[-0.035em] text-[#0A496C] sm:text-5xl lg:text-6xl">
               Tu futuro profesional comienza acá
@@ -54,9 +55,9 @@ export default async function HomePage() {
                 Cómo inscribirme
               </a>
             </div>
-          </div>
+          </MotionReveal>
 
-          <div className="relative lg:col-span-7">
+          <MotionReveal className="relative lg:col-span-7" delay={0.12}>
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#CBD5E1] bg-[#E0ECF8]">
               <Image src="/instituto.jpg" alt="Sala de informática del IES Nuevo Horizonte" fill priority sizes="(max-width: 1024px) 100vw, 58vw" className="object-cover" />
             </div>
@@ -64,7 +65,7 @@ export default async function HomePage() {
               <p className="font-semibold text-[#0A496C]">Excelencia académica</p>
               <p className="mt-1 text-sm leading-5 text-[#52606D]">Títulos oficiales con validez nacional.</p>
             </div>
-          </div>
+          </MotionReveal>
         </div>
       </section>
 
@@ -98,9 +99,7 @@ export default async function HomePage() {
             </div>
             <Link href="/carreras" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C] underline underline-offset-4">Ver las 20 carreras <ArrowRight className="size-4" /></Link>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {featuredCareers.map((career, index) => <CareerCard key={career.slug} career={career} index={index} compact />)}
-          </div>
+          <CareerCarousel careers={featuredCareers} />
         </div>
       </section>
 
@@ -118,6 +117,7 @@ export default async function HomePage() {
               <div><UsersRound className="size-7 text-[#2CBEE7]" /><p className="mt-3 font-semibold">Acompañamiento</p></div>
               <div><Building2 className="size-7 text-[#2CBEE7]" /><p className="mt-3 font-semibold">Entorno profesional</p></div>
             </div>
+            <Link href="/institucion" className="mt-9 inline-flex items-center gap-2 text-sm font-semibold text-[#2CBEE7]">Conocé nuestra institución <ArrowRight className="size-4" /></Link>
           </div>
         </div>
       </section>

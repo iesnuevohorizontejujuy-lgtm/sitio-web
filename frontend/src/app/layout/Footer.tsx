@@ -26,7 +26,7 @@ export default function Footer() {
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Institución</h3>
             <ul className="mt-5 space-y-3 text-sm text-white/70">
-              <li><Link href="/#institucion" className="hover:text-white">Quiénes somos</Link></li>
+              <li><Link href="/institucion" className="hover:text-white">Quiénes somos</Link></li>
               <li><Link href="/vida-institucional" className="hover:text-white">Vida institucional</Link></li>
               <li><Link href="/nhdocs" className="hover:text-white">NHDocs</Link></li>
             </ul>
