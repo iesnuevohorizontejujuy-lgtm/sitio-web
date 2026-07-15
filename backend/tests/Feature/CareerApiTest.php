@@ -9,12 +9,14 @@ it('publishes only visible careers with their study plan and gallery', function 
     Carrera::factory()->draft()->create(['slug' => 'carrera-borrador']);
     Materia::factory()->for($published)->create(['nombre' => 'Programación I', 'anio' => 1]);
     CarreraImagen::factory()->for($published)->create(['texto_alternativo' => 'Estudiantes en el aula']);
+    CarreraImagen::factory()->for($published)->count(9)->create();
 
     $this->getJson('/api/carreras')
         ->assertSuccessful()
         ->assertJsonCount(1)
         ->assertJsonPath('0.slug', 'desarrollo-de-software')
         ->assertJsonPath('0.subjects.0.name', 'Programación I')
+        ->assertJsonCount(8, '0.gallery')
         ->assertJsonPath('0.gallery.0.alt', 'Estudiantes en el aula')
         ->assertJsonMissing(['slug' => 'carrera-borrador']);
 });

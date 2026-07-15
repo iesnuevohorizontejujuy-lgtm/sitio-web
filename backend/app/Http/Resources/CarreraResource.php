@@ -41,7 +41,7 @@ class CarreraResource extends JsonResource
                 'year' => $subject->anio,
                 'order' => $subject->orden,
             ])->values(),
-            'gallery' => $this->imagenes->map(fn ($image): array => [
+            'gallery' => $this->imagenes->take(8)->map(fn ($image): array => [
                 'id' => $image->id,
                 'url' => $this->publicUrl($image->path),
                 'alt' => $image->texto_alternativo,

@@ -145,6 +145,7 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
           <div className="mx-auto max-w-7xl px-5 lg:px-8">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Experiencias de la carrera</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Estudiantes y actividades</h2>
+            <p className="mt-4 max-w-2xl leading-7 text-[#52606D]">Una selección de prácticas, proyectos y momentos compartidos por la comunidad de la carrera.</p>
             <div className="mt-10"><CareerGallery images={career.gallery} /></div>
           </div>
         </section>

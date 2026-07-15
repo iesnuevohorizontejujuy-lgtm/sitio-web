@@ -71,14 +71,14 @@ class CarreraForm
                         ])->columns(2)->collapsible(),
                     ]),
                 Section::make('Galería de la carrera')
-                    ->description('Fotos reales de estudiantes y actividades. El texto alternativo describe cada imagen para accesibilidad.')
+                    ->description('Hasta 8 fotos reales de estudiantes y actividades. El texto alternativo describe cada imagen para accesibilidad.')
                     ->columnSpanFull()
                     ->schema([
                         Repeater::make('imagenes')->relationship()->orderColumn('orden')->reorderable()->addActionLabel('Agregar fotografía')->schema([
                             FileUpload::make('path')->label('Fotografía')->disk('public')->directory('carreras/galerias')->image()->imageEditor()->maxSize(5120)->required(),
                             TextInput::make('texto_alternativo')->label('Texto alternativo')->required()->maxLength(255),
                             TextInput::make('epigrafe')->label('Epígrafe')->maxLength(255),
-                        ])->columns(3)->collapsible(),
+                        ])->columns(3)->collapsible()->maxItems(8),
                     ]),
             ]);
     }
