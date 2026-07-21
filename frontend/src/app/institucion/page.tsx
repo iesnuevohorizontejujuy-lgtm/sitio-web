@@ -13,8 +13,11 @@ import {
   UsersRound,
 } from "lucide-react";
 import { InstitutionalCarousel } from "@/components/institutional/InstitutionalCarousel";
+import { InstitutionalNewsCard } from "@/components/institutional/InstitutionalNewsCard";
 import { MotionReveal } from "@/components/institutional/MotionReveal";
 import { institution, whatsappHref } from "@/config/institution";
+import { getAuthorities } from "@/lib/authorities";
+import { getInstitutionalNews } from "@/lib/institutional-news";
 
 export const metadata: Metadata = {
   title: "Institución | IES Nuevo Horizonte",
@@ -39,7 +42,10 @@ const principles = [
   },
 ] as const;
 
-export default function InstitutionPage() {
+export default async function InstitutionPage() {
+  const [authorities, news] = await Promise.all([getAuthorities(), getInstitutionalNews()]);
+  const agreements = news.generales.filter((item) => item.categoria === "convenio").slice(0, 3);
+
   return (
     <main className="institutional-shell bg-white text-[#121C28]">
       <section className="border-b border-[#D8E1E8]">
@@ -97,6 +103,32 @@ export default function InstitutionPage() {
         </div>
       </section>
 
+      {authorities.length > 0 && (
+        <section className="border-b border-[#D8E1E8] bg-[#F7F9FB] py-20 md:py-24">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
+            <MotionReveal className="max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]">Organización institucional</p>
+              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Autoridades</h2>
+              <p className="mt-5 leading-7 text-[#52606D]">Conocé al equipo responsable de conducir y acompañar el proyecto educativo del instituto.</p>
+            </MotionReveal>
+            <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-[#CBD5E1] bg-[#CBD5E1] sm:grid-cols-2 lg:grid-cols-3">
+              {authorities.map((authority, index) => (
+                <MotionReveal key={authority.id} className="flex h-full gap-5 bg-white p-6" delay={index * 0.06}>
+                  <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-[#E0ECF8]">
+                    {authority.imagen ? <Image src={authority.imagen} alt={`Fotografía de ${authority.nombre}`} fill unoptimized sizes="80px" className="object-cover" /> : <UsersRound className="absolute left-1/2 top-1/2 size-8 -translate-x-1/2 -translate-y-1/2 text-[#0A496C]" />}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-[#0A496C]">{authority.nombre}</h3>
+                    <p className="mt-1 text-sm font-medium text-[#2A718F]">{authority.cargo}</p>
+                    {authority.descripcion && <p className="mt-3 text-sm leading-6 text-[#52606D]">{authority.descripcion}</p>}
+                  </div>
+                </MotionReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="py-20 md:py-24">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <MotionReveal className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -109,6 +141,24 @@ export default function InstitutionPage() {
           <MotionReveal delay={0.08}><InstitutionalCarousel /></MotionReveal>
         </div>
       </section>
+
+      {agreements.length > 0 && (
+        <section className="border-y border-[#D8E1E8] bg-[#F7F9FB] py-20 md:py-24">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
+            <MotionReveal className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]">Vinculación</p>
+                <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Convenios institucionales</h2>
+                <p className="mt-5 max-w-2xl leading-7 text-[#52606D]">Acuerdos y vínculos que amplían las experiencias formativas de nuestra comunidad.</p>
+              </div>
+              <Link href="/vida-institucional" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C]">Ver actualidad institucional <ArrowRight className="size-4" /></Link>
+            </MotionReveal>
+            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {agreements.map((agreement) => <InstitutionalNewsCard key={agreement.id} item={agreement} />)}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="border-y border-[#D8E1E8] bg-[#F7F9FB] py-16">
         <div className="mx-auto grid max-w-7xl gap-6 px-5 md:grid-cols-3 lg:px-8">

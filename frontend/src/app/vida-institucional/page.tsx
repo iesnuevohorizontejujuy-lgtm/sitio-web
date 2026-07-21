@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowRight, CalendarDays, Newspaper, UsersRound } from "lucide-react";
 import { InstitutionalNewsCard } from "@/components/institutional/InstitutionalNewsCard";
+import { InstitutionalNewsExplorer } from "@/components/institutional/InstitutionalNewsExplorer";
 import { whatsappHref } from "@/config/institution";
 import { getInstitutionalNews } from "@/lib/institutional-news";
 
@@ -57,9 +58,7 @@ export default async function InstitutionalLifePage() {
                 </div>
               </div>
               {remainingNews.length > 0 ? (
-                <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {remainingNews.map((item) => <InstitutionalNewsCard key={item.id} item={item} />)}
-                </div>
+                <InstitutionalNewsExplorer items={remainingNews} />
               ) : (
                 <p className="mt-8 border-l-4 border-[#2CBEE7] bg-white p-6 text-[#52606D]">Las próximas noticias y actividades publicadas desde el panel institucional aparecerán acá.</p>
               )}

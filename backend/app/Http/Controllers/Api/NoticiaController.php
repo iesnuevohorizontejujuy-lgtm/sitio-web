@@ -18,7 +18,7 @@ class NoticiaController extends Controller
                 $news->where('categoria', 'fecha_importante')->values(),
             )->resolve(),
             'generales' => NoticiaResource::collection(
-                $news->where('categoria', 'general')->values(),
+                $news->where('categoria', '!=', 'fecha_importante')->values(),
             )->resolve(),
         ]);
     }

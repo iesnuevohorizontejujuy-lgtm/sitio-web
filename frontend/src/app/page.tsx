@@ -4,6 +4,7 @@ import {
   ArrowRight,
   BookOpenCheck,
   Building2,
+  CalendarDays,
   GraduationCap,
   UsersRound,
 } from "lucide-react";
@@ -11,13 +12,15 @@ import { CareerCarousel } from "@/components/institutional/CareerCarousel";
 import { HeroMediaCarousel } from "@/components/institutional/HeroMediaCarousel";
 import { HomeNewsEditorial } from "@/components/institutional/HomeNewsEditorial";
 import { MotionReveal } from "@/components/institutional/MotionReveal";
+import { formatAdmissionDate, getAdmissionCall } from "@/lib/admissions";
 import { getCareers } from "@/lib/careers";
 import { getInstitutionalNews } from "@/lib/institutional-news";
 
 export default async function HomePage() {
-  const [careers, institutionalNews] = await Promise.all([
+  const [careers, institutionalNews, admissionCall] = await Promise.all([
     getCareers(),
     getInstitutionalNews(),
+    getAdmissionCall(),
   ]);
   const featuredSlugs = [
     "desarrollo-de-software",
@@ -56,7 +59,7 @@ export default async function HomePage() {
               </Link>
             </div>
             <div className="mt-9 grid grid-cols-3 gap-4 border-t border-[#D8E1E8] pt-6">
-              <div><p className="text-xl font-semibold text-[#0A496C]">20</p><p className="mt-1 text-xs leading-5 text-[#64748B]">Carreras</p></div>
+              <div><p className="text-xl font-semibold text-[#0A496C]">{careers.length}</p><p className="mt-1 text-xs leading-5 text-[#64748B]">Carreras</p></div>
               <div><p className="text-sm font-semibold text-[#0A496C]">Oficiales</p><p className="mt-1 text-xs leading-5 text-[#64748B]">Títulos</p></div>
               <div><p className="text-sm font-semibold text-[#0A496C]">Presencial</p><p className="mt-1 text-xs leading-5 text-[#64748B]">Modalidad</p></div>
             </div>
@@ -67,6 +70,22 @@ export default async function HomePage() {
           </MotionReveal>
         </div>
       </section>
+
+      {admissionCall && (
+        <section className="border-b border-[#D8E1E8] bg-[#0A496C] text-white">
+          <div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 px-5 py-7 md:flex-row md:items-center lg:px-8">
+            <div className="flex items-start gap-4">
+              <CalendarDays className="mt-1 size-6 shrink-0 text-[#2CBEE7]" />
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2CBEE7]">{admissionCall.estado === "abiertas" ? "Inscripciones abiertas" : admissionCall.estado === "cerradas" ? "Inscripciones cerradas" : "Próximo ingreso"}</p>
+                <h2 className="mt-1 text-xl font-semibold">{admissionCall.titulo}</h2>
+                {(admissionCall.fecha_inicio || admissionCall.fecha_fin) && <p className="mt-1 text-sm text-white/70">{admissionCall.fecha_inicio && formatAdmissionDate(admissionCall.fecha_inicio)}{admissionCall.fecha_inicio && admissionCall.fecha_fin && " — "}{admissionCall.fecha_fin && formatAdmissionDate(admissionCall.fecha_fin)}</p>}
+              </div>
+            </div>
+            <Link href="/ingresantes" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#2CBEE7] px-5 py-3 text-sm font-semibold text-[#073A57]">Ver información de ingreso <ArrowRight className="size-4" /></Link>
+          </div>
+        </section>
+      )}
 
       <section className="border-b border-[#D8E1E8] py-16">
         <div className="mx-auto grid max-w-7xl gap-5 px-5 md:grid-cols-2 lg:px-8">

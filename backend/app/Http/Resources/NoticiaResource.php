@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\InstitutionalHtmlSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -19,7 +20,7 @@ class NoticiaResource extends JsonResource
             'id' => $this->id,
             'titulo' => $this->titulo,
             'slug' => $this->slug,
-            'contenido' => $this->contenido,
+            'contenido' => (new InstitutionalHtmlSanitizer)->sanitize($this->contenido),
             'categoria' => $this->categoria,
             'created_at' => $this->created_at,
             'publicada_at' => $this->publicada_at,

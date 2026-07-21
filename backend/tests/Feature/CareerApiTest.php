@@ -28,3 +28,14 @@ it('returns a published career by slug and hides drafts', function () {
     $this->getJson('/api/carreras/farmacia')->assertSuccessful()->assertJsonPath('slug', 'farmacia');
     $this->getJson('/api/carreras/secreta')->assertNotFound();
 });
+
+it('sanitizes career rich text before publishing it', function () {
+    Carrera::factory()->create([
+        'slug' => 'carrera-segura',
+        'perfil_profesional' => '<p>Perfil profesional</p><script>alert("xss")</script>',
+    ]);
+
+    $this->getJson('/api/carreras/carrera-segura')
+        ->assertSuccessful()
+        ->assertJsonPath('content', '<p>Perfil profesional</p>');
+});

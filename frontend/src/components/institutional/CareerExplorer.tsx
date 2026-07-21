@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Check, Search, Scale, X } from "lucide-react";
 import { careerAreas } from "@/data/career-catalog";
 import type { Career } from "@/types/career";
 import { CareerCard } from "./CareerCard";
@@ -19,6 +20,7 @@ const normalize = (value: string) =>
 export function CareerExplorer({ careers }: CareerExplorerProps) {
   const [query, setQuery] = useState("");
   const [area, setArea] = useState<(typeof careerAreas)[number]>("Todas");
+  const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
 
   const filteredCareers = useMemo(() => {
     const normalizedQuery = normalize(query.trim());
@@ -30,6 +32,16 @@ export function CareerExplorer({ careers }: CareerExplorerProps) {
       return matchesArea && matchesQuery;
     });
   }, [area, careers, query]);
+
+  const selectedCareers = careers.filter((career) => selectedSlugs.includes(career.slug));
+
+  const toggleComparison = (slug: string) => {
+    setSelectedSlugs((current) => {
+      if (current.includes(slug)) return current.filter((item) => item !== slug);
+      if (current.length === 3) return current;
+      return [...current, slug];
+    });
+  };
 
   return (
     <div>
@@ -69,14 +81,60 @@ export function CareerExplorer({ careers }: CareerExplorerProps) {
         </div>
       </div>
 
+      {selectedCareers.length > 0 && (
+        <section id="comparador" className="mb-12 scroll-mt-28 overflow-hidden rounded-2xl border border-[#B7CADB] bg-white" aria-labelledby="comparison-title">
+          <div className="flex flex-col justify-between gap-5 bg-[#0A496C] px-6 py-6 text-white sm:flex-row sm:items-center md:px-8">
+            <div>
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#2CBEE7]"><Scale className="size-4" />Comparador</p>
+              <h2 id="comparison-title" className="mt-2 text-2xl font-semibold">{selectedCareers.length === 1 ? "Elegí al menos una carrera más" : "Compará las propuestas seleccionadas"}</h2>
+            </div>
+            <button type="button" onClick={() => setSelectedSlugs([])} className="inline-flex items-center gap-2 self-start text-sm font-semibold text-white/75 hover:text-white"><X className="size-4" />Limpiar selección</button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[680px] border-collapse text-left">
+              <thead>
+                <tr className="border-b border-[#D8E1E8] bg-[#F7F9FB]">
+                  <th className="w-40 px-6 py-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#64748B]">Dato</th>
+                  {selectedCareers.map((career) => <th key={career.slug} className="min-w-56 px-6 py-5 text-base font-semibold text-[#0A496C]">{career.shortTitle || career.title.replace("Tecnicatura Superior en ", "")}</th>)}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E2E8F0] text-sm">
+                <ComparisonRow label="Área" careers={selectedCareers} value={(career) => career.area} />
+                <ComparisonRow label="Duración" careers={selectedCareers} value={(career) => career.duration} />
+                <ComparisonRow label="Modalidad" careers={selectedCareers} value={(career) => career.modality} />
+                <ComparisonRow label="Resolución" careers={selectedCareers} value={(career) => career.resolutionCode || "Consultar"} />
+                <tr>
+                  <th className="px-6 py-5 font-semibold text-[#0A496C]">Detalle</th>
+                  {selectedCareers.map((career) => (
+                    <td key={career.slug} className="px-6 py-5"><Link href={`/carreras/${career.slug}`} className="inline-flex items-center gap-2 font-semibold text-[#0A496C] underline underline-offset-4">Ver carrera <ArrowRight className="size-4" /></Link></td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
       {filteredCareers.length > 0 ? (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {filteredCareers.map((career) => (
-            <CareerCard
-              key={career.slug}
-              career={career}
-              index={careers.findIndex((item) => item.slug === career.slug)}
-            />
+            <div key={career.slug} className="flex flex-col">
+              <button
+                type="button"
+                onClick={() => toggleComparison(career.slug)}
+                disabled={!selectedSlugs.includes(career.slug) && selectedSlugs.length === 3}
+                aria-pressed={selectedSlugs.includes(career.slug)}
+                className={`flex min-h-11 items-center justify-center gap-2 border border-b-0 px-4 text-sm font-semibold transition ${selectedSlugs.includes(career.slug) ? "border-[#0A496C] bg-[#0A496C] text-white" : "border-[#CBD5E1] bg-[#F7F9FB] text-[#0A496C] hover:bg-[#E0ECF8] disabled:cursor-not-allowed disabled:text-[#94A3B8]"}`}
+              >
+                {selectedSlugs.includes(career.slug) ? <Check className="size-4" /> : <Scale className="size-4" />}
+                {selectedSlugs.includes(career.slug) ? "Seleccionada para comparar" : selectedSlugs.length === 3 ? "Máximo de 3 carreras" : "Agregar al comparador"}
+              </button>
+              <CareerCard
+                career={career}
+                index={careers.findIndex((item) => item.slug === career.slug)}
+              />
+            </div>
           ))}
         </div>
       ) : (
@@ -86,5 +144,14 @@ export function CareerExplorer({ careers }: CareerExplorerProps) {
         </div>
       )}
     </div>
+  );
+}
+
+function ComparisonRow({ careers, label, value }: { careers: Career[]; label: string; value: (career: Career) => string }) {
+  return (
+    <tr>
+      <th className="px-6 py-5 font-semibold text-[#0A496C]">{label}</th>
+      {careers.map((career) => <td key={career.slug} className="px-6 py-5 text-[#52606D]">{value(career)}</td>)}
+    </tr>
   );
 }

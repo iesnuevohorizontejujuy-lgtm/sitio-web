@@ -1,9 +1,13 @@
 <?php
 
+use App\Filament\Resources\Autoridads\Pages\ListAutoridads;
 use App\Filament\Resources\Carreras\Pages\ListCarreras;
 use App\Filament\Resources\Consultas\Pages\ListConsultas;
+use App\Filament\Resources\ConvocatoriaIngresos\Pages\ListConvocatoriaIngresos;
+use App\Models\Autoridad;
 use App\Models\Carrera;
 use App\Models\Consulta;
+use App\Models\ConvocatoriaIngreso;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -33,4 +37,24 @@ it('lists inquiries and can mark one as answered', function () {
     expect($inquiry->fresh())
         ->estado->toBe('respondida')
         ->respondida_at->not->toBeNull();
+});
+
+it('lists admissions calls in the CMS', function () {
+    $calls = ConvocatoriaIngreso::factory()->count(2)->create();
+
+    Livewire::test(ListConvocatoriaIngresos::class)
+        ->assertCanSeeTableRecords($calls)
+        ->assertTableColumnExists('titulo')
+        ->assertTableColumnExists('estado')
+        ->assertTableColumnExists('esta_publicada');
+});
+
+it('lists authorities in the CMS', function () {
+    $authorities = Autoridad::factory()->count(2)->create();
+
+    Livewire::test(ListAutoridads::class)
+        ->assertCanSeeTableRecords($authorities)
+        ->assertTableColumnExists('nombre')
+        ->assertTableColumnExists('cargo')
+        ->assertTableColumnExists('publicada');
 });

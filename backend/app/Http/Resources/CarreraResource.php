@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\InstitutionalHtmlSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +16,8 @@ class CarreraResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $htmlSanitizer = new InstitutionalHtmlSanitizer;
+
         return [
             'id' => $this->id,
             'title' => $this->nombre,
@@ -23,8 +26,8 @@ class CarreraResource extends JsonResource
             'slug' => $this->slug,
             'area' => $this->area,
             'description' => $this->descripcion_corta,
-            'content' => $this->perfil_profesional ?: $this->descripcion,
-            'perfil_profesional' => $this->perfil_profesional,
+            'content' => $htmlSanitizer->sanitize($this->perfil_profesional ?: $this->descripcion),
+            'perfil_profesional' => $htmlSanitizer->sanitize($this->perfil_profesional),
             'duracion' => $this->duracion_anios.' años',
             'modalidad' => $this->modalidad,
             'titulo_otorgado' => $this->titulo_otorgado,

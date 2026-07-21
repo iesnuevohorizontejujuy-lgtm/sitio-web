@@ -21,6 +21,14 @@ export function InstitutionalNewsCard({
     ? item.fecha_evento
     : item.created_at;
   const excerpt = stripInstitutionalHtml(item.contenido);
+  const categoryLabel = {
+    general: "Actualidad",
+    actividad: "Actividad",
+    jornada: "Jornada",
+    practica: "Práctica profesional",
+    convenio: "Convenio",
+    fecha_importante: "Agenda",
+  }[item.categoria];
 
   return (
     <article className={`group overflow-hidden rounded-xl border border-[#CBD5E1] bg-white ${featured ? "md:grid md:grid-cols-2" : "flex h-full flex-col"}`}>
@@ -46,7 +54,7 @@ export function InstitutionalNewsCard({
 
       <div className={`flex flex-1 flex-col ${featured ? "p-8 md:p-10" : "p-6"}`}>
         <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.12em]">
-          <span className="text-[#0A496C]">{isEvent ? "Agenda" : "Actualidad"}</span>
+          <span className="text-[#0A496C]">{categoryLabel}</span>
           <span className="size-1 rounded-full bg-[#2CBEE7]" />
           <time dateTime={date} className="text-[#64748B]">{formatInstitutionalDate(date)}</time>
         </div>

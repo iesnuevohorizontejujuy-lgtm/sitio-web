@@ -16,7 +16,8 @@ import {
 import { StudyPlan } from "@/components/institutional/StudyPlan";
 import { CareerGallery } from "@/components/institutional/CareerGallery";
 import { CareerInquiryForm } from "@/components/institutional/CareerInquiryForm";
-import { getCareer } from "@/lib/careers";
+import { CareerCard } from "@/components/institutional/CareerCard";
+import { getCareer, getCareers } from "@/lib/careers";
 import type { CareerArea } from "@/types/career";
 
 interface CareerDetailPageProps {
@@ -40,10 +41,13 @@ export async function generateMetadata({ params }: CareerDetailPageProps): Promi
 
 export default async function CareerDetailPage({ params }: CareerDetailPageProps) {
   const { slug } = await params;
-  const career = await getCareer(slug);
+  const [career, careers] = await Promise.all([getCareer(slug), getCareers()]);
   if (!career) notFound();
 
   const shortTitle = career.shortTitle || career.title.replace("Tecnicatura Superior en ", "");
+  const relatedCareers = careers
+    .filter((item) => item.slug !== career.slug && item.area === career.area)
+    .slice(0, 3);
 
   return (
     <main className="institutional-shell bg-[#F8FAFD] text-[#121C28]">
@@ -165,6 +169,25 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
           </div>
         </div>
       </section>
+
+      {relatedCareers.length > 0 && (
+        <section className="border-t border-[#D8E1E8] bg-[#F7F9FB] py-20">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
+            <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">También te puede interesar</p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C]">Otras carreras de {career.area}</h2>
+              </div>
+              <Link href="/carreras" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C] underline underline-offset-4">Explorar toda la oferta <ArrowLeft className="size-4 rotate-180" /></Link>
+            </div>
+            <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {relatedCareers.map((relatedCareer) => (
+                <CareerCard key={relatedCareer.slug} career={relatedCareer} index={careers.findIndex((item) => item.slug === relatedCareer.slug)} compact />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section id="consulta" className="scroll-mt-28 bg-[#E0ECF8] px-5 py-16 lg:px-8 lg:py-20">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-12">

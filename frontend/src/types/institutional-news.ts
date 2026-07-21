@@ -1,4 +1,10 @@
-export type InstitutionalNewsCategory = "general" | "fecha_importante";
+export type InstitutionalNewsCategory =
+  | "general"
+  | "actividad"
+  | "jornada"
+  | "practica"
+  | "convenio"
+  | "fecha_importante";
 
 export interface InstitutionalNewsItem {
   id: number | string;

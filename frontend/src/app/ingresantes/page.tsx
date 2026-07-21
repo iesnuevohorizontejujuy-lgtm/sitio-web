@@ -5,8 +5,11 @@ import {
   ArrowRight,
   BadgeCheck,
   BookOpenCheck,
+  CalendarDays,
   CheckCircle2,
   ClipboardCheck,
+  Download,
+  FileCheck2,
   GraduationCap,
   HelpCircle,
   MessageCircleQuestion,
@@ -14,6 +17,7 @@ import {
 } from "lucide-react";
 import { CareerInquiryForm } from "@/components/institutional/CareerInquiryForm";
 import { MotionReveal } from "@/components/institutional/MotionReveal";
+import { formatAdmissionDate, getAdmissionCall } from "@/lib/admissions";
 import { getCareers } from "@/lib/careers";
 
 export const metadata: Metadata = {
@@ -44,7 +48,7 @@ const steps = [
   },
 ] as const;
 
-const faqs = [
+const fallbackFaqs = [
   {
     question: "¿Cómo sé si una carrera tiene inscripciones disponibles?",
     answer: "Completá el formulario de orientación o consultá desde la ficha de la carrera. El equipo del instituto confirmará la disponibilidad del próximo ingreso.",
@@ -64,8 +68,24 @@ const faqs = [
 ] as const;
 
 export default async function AdmissionsPage() {
-  const careers = await getCareers();
+  const [careers, admissionCall] = await Promise.all([
+    getCareers(),
+    getAdmissionCall(),
+  ]);
   const areas = [...new Set(careers.map((career) => career.area))];
+  const faqs = admissionCall?.preguntas_frecuentes.length
+    ? admissionCall.preguntas_frecuentes.map((faq) => ({
+        question: faq.pregunta,
+        answer: faq.respuesta,
+      }))
+    : fallbackFaqs;
+  const statusLabel = admissionCall
+    ? {
+        abiertas: "Inscripciones abiertas",
+        cerradas: "Inscripciones cerradas",
+        proximamente: "Próximamente",
+      }[admissionCall.estado]
+    : null;
 
   return (
     <main className="institutional-shell bg-white text-[#121C28]">
@@ -97,6 +117,60 @@ export default async function AdmissionsPage() {
           </MotionReveal>
         </div>
       </section>
+
+      {admissionCall && (
+        <section className="border-b border-[#D8E1E8] bg-white py-16 md:py-20">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
+            <MotionReveal className="grid overflow-hidden rounded-2xl border border-[#B7CADB] lg:grid-cols-12">
+              <div className="bg-[#0A496C] p-7 text-white md:p-10 lg:col-span-5">
+                <span className="inline-flex rounded-md bg-[#2CBEE7] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[#073A57]">{statusLabel}</span>
+                <p className="mt-8 text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Información oficial publicada</p>
+                <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em]">{admissionCall.titulo}</h2>
+                {admissionCall.bajada && <p className="mt-5 leading-7 text-white/75">{admissionCall.bajada}</p>}
+                <div className="mt-8 grid gap-4 border-t border-white/15 pt-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.12em] text-white/55">Ciclo lectivo</p>
+                    <p className="mt-1 font-semibold">{admissionCall.ciclo_lectivo}</p>
+                  </div>
+                  {(admissionCall.fecha_inicio || admissionCall.fecha_fin) && (
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.12em] text-white/55">Período informado</p>
+                      <p className="mt-1 text-sm font-semibold leading-6">
+                        {admissionCall.fecha_inicio && formatAdmissionDate(admissionCall.fecha_inicio)}
+                        {admissionCall.fecha_inicio && admissionCall.fecha_fin && " — "}
+                        {admissionCall.fecha_fin && formatAdmissionDate(admissionCall.fecha_fin)}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid gap-8 p-7 md:p-10 lg:col-span-7">
+                {admissionCall.requisitos.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-3 text-[#0A496C]"><FileCheck2 className="size-6" /><h3 className="text-xl font-semibold">Requisitos publicados</h3></div>
+                    <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+                      {admissionCall.requisitos.map((requirement) => (
+                        <li key={requirement} className="flex gap-3 text-sm leading-6 text-[#52606D]"><CheckCircle2 className="mt-1 size-4 shrink-0 text-[#2CBEE7]" />{requirement}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {admissionCall.documentos.length > 0 && (
+                  <div className="border-t border-[#D8E1E8] pt-7">
+                    <div className="flex items-center gap-3 text-[#0A496C]"><CalendarDays className="size-6" /><h3 className="text-xl font-semibold">Documentación para descargar</h3></div>
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      {admissionCall.documentos.map((document) => (
+                        <a key={document.url} href={document.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-[#B7CADB] px-4 py-3 text-sm font-semibold text-[#0A496C] hover:bg-[#E0ECF8]">{document.nombre}<Download className="size-4" /></a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </MotionReveal>
+          </div>
+        </section>
+      )}
 
       <section className="border-b border-[#D8E1E8] bg-[#F7F9FB] py-20 md:py-24">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">

@@ -29,7 +29,11 @@ class NoticiaForm
             ]),
             Section::make('Publicación')->columnSpan(1)->schema([
                 Select::make('categoria')->label('Tipo')->required()->native(false)->options([
-                    'general' => 'Noticia o actividad',
+                    'general' => 'Noticia general',
+                    'actividad' => 'Actividad institucional',
+                    'jornada' => 'Jornada',
+                    'practica' => 'Práctica profesional',
+                    'convenio' => 'Convenio',
                     'fecha_importante' => 'Fecha importante',
                 ]),
                 DatePicker::make('fecha_evento')->label('Fecha de la actividad'),
