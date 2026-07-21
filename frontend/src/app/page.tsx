@@ -11,7 +11,6 @@ import { CareerCarousel } from "@/components/institutional/CareerCarousel";
 import { HeroMediaCarousel } from "@/components/institutional/HeroMediaCarousel";
 import { HomeNewsEditorial } from "@/components/institutional/HomeNewsEditorial";
 import { MotionReveal } from "@/components/institutional/MotionReveal";
-import { whatsappHref } from "@/config/institution";
 import { getCareers } from "@/lib/careers";
 import { getInstitutionalNews } from "@/lib/institutional-news";
 
@@ -52,9 +51,9 @@ export default async function HomePage() {
               <Link href="/carreras" className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#2CBEE7] px-6 py-3 text-sm font-semibold text-[#073A57] transition hover:bg-[#51D5FF]">
                 Conocé nuestras carreras
               </Link>
-              <a href={whatsappHref("Hola, quiero saber cómo inscribirme en el IES Nuevo Horizonte.")} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-[#0A496C] px-6 py-3 text-sm font-semibold text-[#0A496C] transition hover:bg-[#E0ECF8]">
+              <Link href="/ingresantes" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-[#0A496C] px-6 py-3 text-sm font-semibold text-[#0A496C] transition hover:bg-[#E0ECF8]">
                 Cómo inscribirme
-              </a>
+              </Link>
             </div>
             <div className="mt-9 grid grid-cols-3 gap-4 border-t border-[#D8E1E8] pt-6">
               <div><p className="text-xl font-semibold text-[#0A496C]">20</p><p className="mt-1 text-xs leading-5 text-[#64748B]">Carreras</p></div>
@@ -147,7 +146,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl rounded-2xl bg-[#0A496C] px-6 py-14 text-center text-white sm:px-12 md:py-16">
           <h2 className="text-3xl font-semibold tracking-[-0.025em] md:text-4xl">¿Listo para dar el próximo paso?</h2>
           <p className="mx-auto mt-4 max-w-2xl leading-7 text-white/75">Consultá la disponibilidad del próximo ciclo lectivo y recibí acompañamiento durante tu inscripción.</p>
-          <a href={whatsappHref("Hola, quiero iniciar mi inscripción en el IES Nuevo Horizonte.")} target="_blank" rel="noreferrer" className="mt-8 inline-flex min-h-12 items-center justify-center rounded-lg bg-[#2CBEE7] px-7 py-3 text-sm font-semibold text-[#073A57] hover:bg-white">Iniciá tu inscripción</a>
+          <Link href="/ingresantes" className="mt-8 inline-flex min-h-12 items-center justify-center rounded-lg bg-[#2CBEE7] px-7 py-3 text-sm font-semibold text-[#073A57] hover:bg-white">Conocé cómo inscribirte</Link>
         </div>
       </section>
     </main>

@@ -5,12 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Facebook, Instagram, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { institution, whatsappHref } from "@/config/institution";
+import { institution } from "@/config/institution";
 
 const navigation = [
   { label: "Inicio", href: "/" },
   { label: "Institución", href: "/institucion" },
   { label: "Carreras", href: "/carreras" },
+  { label: "Ingresantes", href: "/ingresantes" },
   { label: "Vida institucional", href: "/vida-institucional" },
   { label: "Contacto", href: "/#contacto" },
 ];
@@ -47,11 +48,12 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <div className="hidden items-center gap-6 xl:flex">
+          <div className="hidden items-center gap-5 xl:flex">
             {navigation.map((item) => {
               const active =
                 (item.href === "/carreras" && pathname?.startsWith("/carreras")) ||
                 (item.href === "/institucion" && pathname?.startsWith("/institucion")) ||
+                (item.href === "/ingresantes" && pathname?.startsWith("/ingresantes")) ||
                 (item.href === "/vida-institucional" && pathname?.startsWith("/vida-institucional"));
               return (
                 <Link key={item.href} href={item.href} className={`border-b-2 py-2 text-sm font-medium transition-colors ${active ? "border-[#0A496C] text-[#0A496C]" : "border-transparent text-[#52606D] hover:text-[#0A496C]"}`}>
@@ -65,9 +67,9 @@ export default function Navbar() {
             <Link href="/campus" className="rounded-lg border border-[#0A496C] px-4 py-2.5 text-sm font-semibold text-[#0A496C] transition hover:bg-[#E0ECF8]">
               Acceso académico
             </Link>
-            <a href={whatsappHref("Hola, quiero recibir información sobre las inscripciones del IES Nuevo Horizonte.")} target="_blank" rel="noreferrer" className="rounded-lg bg-[#0A496C] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#073A57]">
+            <Link href="/ingresantes" className="rounded-lg bg-[#0A496C] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#073A57]">
               Inscribite
-            </a>
+            </Link>
           </div>
 
           <button type="button" onClick={() => setIsOpen((open) => !open)} className="rounded-lg border border-[#CBD5E1] p-2 text-[#0A496C] xl:hidden" aria-expanded={isOpen} aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}>
@@ -85,7 +87,7 @@ export default function Navbar() {
               ))}
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 <Link href="/campus" onClick={() => setIsOpen(false)} className="rounded-lg border border-[#0A496C] px-4 py-3 text-center text-sm font-semibold text-[#0A496C]">Acceso académico</Link>
-                <a href={whatsappHref("Hola, quiero recibir información sobre las inscripciones del IES Nuevo Horizonte.")} target="_blank" rel="noreferrer" className="rounded-lg bg-[#0A496C] px-4 py-3 text-center text-sm font-semibold text-white">Inscribite</a>
+                <Link href="/ingresantes" onClick={() => setIsOpen(false)} className="rounded-lg bg-[#0A496C] px-4 py-3 text-center text-sm font-semibold text-white">Inscribite</Link>
               </div>
             </div>
           </div>

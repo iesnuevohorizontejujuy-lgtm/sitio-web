@@ -35,8 +35,9 @@ export default function Footer() {
             <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Académico</h3>
             <ul className="mt-5 space-y-3 text-sm text-white/70">
               <li><Link href="/carreras" className="hover:text-white">Carreras</Link></li>
+              <li><Link href="/ingresantes" className="hover:text-white">Ingresantes</Link></li>
               <li><Link href="/campus" className="hover:text-white">Campus Virtual</Link></li>
-              <li><a href={`https://wa.me/${institution.primaryPhone.whatsapp}`} className="hover:text-white">Inscripciones</a></li>
+              <li><Link href="/ingresantes#orientacion" className="hover:text-white">Orientación e inscripciones</Link></li>
             </ul>
           </div>
           <div>

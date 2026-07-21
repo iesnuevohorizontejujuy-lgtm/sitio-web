@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { BriefcaseBusiness, GraduationCap, UsersRound } from "lucide-react";
 import { CareerExplorer } from "@/components/institutional/CareerExplorer";
 import { whatsappHref } from "@/config/institution";
@@ -59,7 +60,7 @@ export default async function CareersPage() {
           <div className="bg-[#0A496C] p-8 text-white md:p-10">
             <h2 className="text-2xl font-semibold">Inscripciones</h2>
             <p className="mt-4 max-w-xl leading-7 text-white/75">Consultá requisitos, documentación y disponibilidad para el próximo ciclo lectivo.</p>
-            <a href={whatsappHref("Hola, quiero conocer los requisitos de inscripción.")} target="_blank" rel="noreferrer" className="mt-7 inline-flex rounded-lg bg-[#2CBEE7] px-5 py-3 text-sm font-semibold text-[#073A57] hover:bg-white">Cómo inscribirme</a>
+            <Link href="/ingresantes" className="mt-7 inline-flex rounded-lg bg-[#2CBEE7] px-5 py-3 text-sm font-semibold text-[#073A57] hover:bg-white">Cómo inscribirme</Link>
           </div>
         </div>
       </section>
