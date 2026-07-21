@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AutoridadController;
+use App\Http\Controllers\Api\AvisoSitioController;
 use App\Http\Controllers\Api\CarreraController;
 use App\Http\Controllers\Api\ConsultaController;
 use App\Http\Controllers\Api\ConvocatoriaIngresoController;
@@ -15,5 +16,6 @@ Route::get('/noticias/{slug}', [NoticiaController::class, 'show']);
 
 Route::get('/ingresantes', [ConvocatoriaIngresoController::class, 'index']);
 Route::get('/autoridades', [AutoridadController::class, 'index']);
+Route::get('/avisos', [AvisoSitioController::class, 'index'])->name('api.avisos.index');
 
 Route::post('/consultas', ConsultaController::class)->middleware('throttle:consultas');

@@ -1,10 +1,12 @@
 <?php
 
 use App\Filament\Resources\Autoridads\Pages\ListAutoridads;
+use App\Filament\Resources\AvisoSitios\Pages\ListAvisoSitios;
 use App\Filament\Resources\Carreras\Pages\ListCarreras;
 use App\Filament\Resources\Consultas\Pages\ListConsultas;
 use App\Filament\Resources\ConvocatoriaIngresos\Pages\ListConvocatoriaIngresos;
 use App\Models\Autoridad;
+use App\Models\AvisoSitio;
 use App\Models\Carrera;
 use App\Models\Consulta;
 use App\Models\ConvocatoriaIngreso;
@@ -57,4 +59,14 @@ it('lists authorities in the CMS', function () {
         ->assertTableColumnExists('nombre')
         ->assertTableColumnExists('cargo')
         ->assertTableColumnExists('publicada');
+});
+
+it('lists site notices in the CMS', function () {
+    $notices = AvisoSitio::factory()->count(2)->create();
+
+    Livewire::test(ListAvisoSitios::class)
+        ->assertCanSeeTableRecords($notices)
+        ->assertTableColumnExists('titulo')
+        ->assertTableColumnExists('presentacion')
+        ->assertTableColumnExists('publicado');
 });

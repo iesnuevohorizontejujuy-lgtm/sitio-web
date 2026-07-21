@@ -5,6 +5,7 @@ import Navbar from "./layout/NavBar";
 import Footer from "./layout/Footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { institution } from "@/config/institution";
+import { SiteNotices } from "@/components/institutional/SiteNotices";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -67,6 +68,7 @@ export default function RootLayout({
             disableTransitionOnChange
         >
           <Navbar />
+          <SiteNotices />
           {children}
           <Footer />
         </ThemeProvider>
