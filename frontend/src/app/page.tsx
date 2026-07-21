@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { CareerCarousel } from "@/components/institutional/CareerCarousel";
 import { HeroMediaCarousel } from "@/components/institutional/HeroMediaCarousel";
-import { InstitutionalNewsCard } from "@/components/institutional/InstitutionalNewsCard";
+import { HomeNewsEditorial } from "@/components/institutional/HomeNewsEditorial";
 import { MotionReveal } from "@/components/institutional/MotionReveal";
 import { whatsappHref } from "@/config/institution";
 import { getCareers } from "@/lib/careers";
@@ -34,7 +34,7 @@ export default async function HomePage() {
     ...institutionalNews.fechas_importantes,
   ]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 3);
+    .slice(0, 4);
 
   return (
     <main className="institutional-shell bg-white text-[#121C28]">
@@ -126,13 +126,14 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]"><span className="h-0.5 w-8 bg-[#0A496C]" />Comunidad</p>
           <div className="mt-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <h2 className="text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Vida institucional</h2>
+            <div>
+              <h2 className="text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Vida institucional</h2>
+              <p className="mt-3 max-w-2xl leading-7 text-[#52606D]">Actualidad, actividades y fechas importantes de nuestra comunidad educativa.</p>
+            </div>
             <Link href="/vida-institucional" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C]">Ver todas las novedades <ArrowRight className="size-4" /></Link>
           </div>
           {latestInstitutionalNews.length > 0 ? (
-            <div className="mt-10 grid gap-8 md:grid-cols-3">
-              {latestInstitutionalNews.map((item) => <InstitutionalNewsCard key={item.id} item={item} />)}
-            </div>
+            <HomeNewsEditorial items={latestInstitutionalNews} />
           ) : (
             <Link href="/vida-institucional" className="mt-10 flex items-center justify-between gap-6 border-l-4 border-[#2CBEE7] bg-[#F7F9FB] p-7 text-[#52606D]">
               <span>Las próximas noticias y actividades cargadas desde el panel institucional aparecerán acá.</span>
