@@ -41,6 +41,21 @@ const normalizeCareer = (raw: ApiCareer): Career | null => {
     capabilities: raw.capabilities ?? raw.capacidades ?? [],
     employment: raw.employment ?? raw.salida_laboral ?? [],
     gallery: Array.isArray(raw.gallery) ? raw.gallery : [],
+    socialPosts: Array.isArray(raw.social_posts)
+      ? raw.social_posts.map((post) => ({
+          id: post.id,
+          platform: post.platform,
+          type: post.type,
+          title: post.title,
+          description: post.description ?? null,
+          url: post.url,
+          account: post.account ?? null,
+          publishedAt: post.published_at ?? null,
+          buttonLabel: post.button_label || "Ver publicación",
+          previewImage: post.preview_image ?? null,
+          previewAlt: post.preview_alt ?? null,
+        }))
+      : [],
   };
 };
 

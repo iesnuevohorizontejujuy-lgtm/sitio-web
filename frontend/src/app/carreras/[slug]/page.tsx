@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { StudyPlan } from "@/components/institutional/StudyPlan";
 import { CareerGallery } from "@/components/institutional/CareerGallery";
+import { CareerSocialShowcase } from "@/components/institutional/CareerSocialShowcase";
 import { CareerInquiryForm } from "@/components/institutional/CareerInquiryForm";
 import { CareerCard } from "@/components/institutional/CareerCard";
 import { getCareer, getCareers } from "@/lib/careers";
@@ -69,8 +70,8 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
             <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-[-0.035em] text-[#0A496C] sm:text-5xl">{career.title}</h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-[#52606D]">{career.description}</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a href="#consulta" className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#0A496C] px-6 py-3 text-sm font-semibold text-white hover:bg-[#073A57]">Quiero inscribirme</a>
-              <a href="#consulta" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-[#0A496C] px-6 py-3 text-sm font-semibold text-[#0A496C] hover:bg-[#E0ECF8]">Hacer una consulta</a>
+              <a href="#inscripcion" className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#0A496C] px-6 py-3 text-sm font-semibold text-white hover:bg-[#073A57]">Inscribirme en {shortTitle}</a>
+              <a href={(career.socialPosts.length > 0 || career.gallery.length > 0) ? "#experiencias" : "#formacion"} className="inline-flex min-h-12 items-center justify-center rounded-lg border border-[#0A496C] px-6 py-3 text-sm font-semibold text-[#0A496C] hover:bg-[#E0ECF8]">Conocer la carrera</a>
             </div>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#CBD5E1] bg-[#E0ECF8] lg:col-span-6">
@@ -88,7 +89,42 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
         </div>
       </section>
 
-      <section className="py-20">
+      {(career.socialPosts.length > 0 || career.gallery.length > 0) && (
+        <section id="experiencias" className="scroll-mt-28 border-b border-[#D8E1E8] bg-white py-20">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
+            <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+              <div className="max-w-3xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Conocé la carrera desde adentro</p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Actividades y experiencias reales</h2>
+                <p className="mt-4 max-w-2xl leading-7 text-[#52606D]">Estudiantes y egresados comparten prácticas, proyectos y momentos que forman parte de la vida cotidiana de {shortTitle}.</p>
+              </div>
+              <a href="#formacion" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C] underline decoration-[#2CBEE7] decoration-2 underline-offset-4">Ver información académica <ArrowLeft className="size-4 rotate-180" /></a>
+            </div>
+
+            {career.socialPosts.length > 0 && (
+              <div className="mt-12">
+                <div className="mb-6 flex items-center gap-3">
+                  <span className="h-px w-10 bg-[#2CBEE7]" aria-hidden="true" />
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#0A496C]">Voces de la comunidad</h3>
+                </div>
+                <CareerSocialShowcase posts={career.socialPosts} />
+              </div>
+            )}
+
+            {career.gallery.length > 0 && (
+              <div className={career.socialPosts.length > 0 ? "mt-16 border-t border-[#D8E1E8] pt-12" : "mt-12"}>
+                <div className="mb-6 flex items-center gap-3">
+                  <span className="h-px w-10 bg-[#2CBEE7]" aria-hidden="true" />
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#0A496C]">Prácticas y actividades</h3>
+                </div>
+                <CareerGallery images={career.gallery} />
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      <section id="formacion" className="scroll-mt-28 py-20">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 lg:grid-cols-12 lg:px-8">
           <article className="border border-[#CBD5E1] bg-white p-7 md:p-10 lg:col-span-8">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Tu formación</p>
@@ -144,17 +180,6 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
         </div>
       </section>
 
-      {career.gallery.length > 0 && (
-        <section className="border-y border-[#D8E1E8] bg-[#F7F9FB] py-20">
-          <div className="mx-auto max-w-7xl px-5 lg:px-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Experiencias de la carrera</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Estudiantes y actividades</h2>
-            <p className="mt-4 max-w-2xl leading-7 text-[#52606D]">Una selección de prácticas, proyectos y momentos compartidos por la comunidad de la carrera.</p>
-            <div className="mt-10"><CareerGallery images={career.gallery} /></div>
-          </div>
-        </section>
-      )}
-
       <section className="bg-white py-20">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-12 lg:px-8">
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#CBD5E1] lg:col-span-5"><Image src="/instituto.jpg" alt="Instalaciones del IES Nuevo Horizonte" fill sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover" /></div>
@@ -189,15 +214,27 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
         </section>
       )}
 
-      <section id="consulta" className="scroll-mt-28 bg-[#E0ECF8] px-5 py-16 lg:px-8 lg:py-20">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]">Contacto</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C]">Consultá por {shortTitle}</h2>
-            <p className="mt-5 leading-7 text-[#52606D]">Dejanos tus datos y la consulta llegará al equipo del instituto. Podrán responderte directamente por WhatsApp.</p>
+      <section id="inscripcion" className="scroll-mt-28 bg-[#0A496C] px-5 py-16 text-white lg:px-8 lg:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid items-end gap-8 border-b border-white/20 pb-10 lg:grid-cols-12">
+            <div className="lg:col-span-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8CDDF3]">Tu próximo paso</p>
+              <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-[-0.025em] md:text-5xl">Inscribite en {shortTitle}</h2>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-white/75">Completá tus datos y el equipo del instituto te contactará por WhatsApp para orientarte con la inscripción y resolver tus dudas.</p>
+            </div>
+            <div className="lg:col-span-4 lg:text-right">
+              <a href="#formulario-inscripcion" className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#2CBEE7] px-6 py-3 text-sm font-semibold text-[#073A57] transition hover:bg-white">Quiero inscribirme</a>
+            </div>
           </div>
-          <div className="rounded-2xl bg-white p-6 md:p-9 lg:col-span-8">
-            <CareerInquiryForm careerId={career.id} careerTitle={career.title} />
+
+          <div className="mt-10 grid gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <h3 className="text-xl font-semibold">Hablemos sobre la carrera</h3>
+              <p className="mt-4 text-sm leading-6 text-white/70">La consulta quedará asociada automáticamente a {shortTitle}, para que el equipo pueda darte una respuesta específica.</p>
+            </div>
+            <div id="formulario-inscripcion" className="scroll-mt-28 rounded-2xl bg-white p-6 text-[#121C28] md:p-9 lg:col-span-8">
+              <CareerInquiryForm careerId={career.id} careerTitle={career.title} />
+            </div>
           </div>
         </div>
       </section>

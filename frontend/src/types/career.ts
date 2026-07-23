@@ -17,6 +17,22 @@ export interface CareerGalleryImage {
   caption?: string | null;
 }
 
+export type CareerSocialPlatform = "instagram" | "youtube" | "facebook" | "tiktok";
+
+export interface CareerSocialPost {
+  id: number | string;
+  platform: CareerSocialPlatform;
+  type: "reel" | "publicacion" | "video" | "actividad";
+  title: string;
+  description?: string | null;
+  url: string;
+  account?: string | null;
+  publishedAt?: string | null;
+  buttonLabel: string;
+  previewImage?: string | null;
+  previewAlt?: string | null;
+}
+
 export interface Career {
   id: number | null;
   title: string;
@@ -37,6 +53,7 @@ export interface Career {
   capabilities: string[];
   employment: string[];
   gallery: CareerGalleryImage[];
+  socialPosts: CareerSocialPost[];
 }
 
 export interface ApiCareer {
@@ -67,4 +84,17 @@ export interface ApiCareer {
   employment?: string[];
   salida_laboral?: string[];
   gallery?: CareerGalleryImage[];
+  social_posts?: Array<{
+    id: number | string;
+    platform: CareerSocialPlatform;
+    type: CareerSocialPost["type"];
+    title: string;
+    description?: string | null;
+    url: string;
+    account?: string | null;
+    published_at?: string | null;
+    button_label?: string | null;
+    preview_image?: string | null;
+    preview_alt?: string | null;
+  }>;
 }
