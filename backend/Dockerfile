@@ -103,10 +103,10 @@ RUN set -eux; \
     nginx -t; \
     php-fpm -tt
 
-EXPOSE 8080
+EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD curl --fail --silent --show-error http://127.0.0.1:8080/up || exit 1
+    CMD curl --fail --silent --show-error http://127.0.0.1:80/up || exit 1
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 CMD ["nginx", "-g", "daemon off;"]
