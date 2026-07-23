@@ -1,33 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-FROM composer:2 AS vendor
-
-WORKDIR /app
-
-COPY composer.json composer.lock ./
-
-RUN composer install \
-    --no-dev \
-    --no-interaction \
-    --no-progress \
-    --no-scripts \
-    --optimize-autoloader \
-    --prefer-dist
-
-FROM node:22-alpine AS assets
-
-WORKDIR /app
-
-COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
-
-COPY --from=vendor /app/vendor ./vendor
-COPY resources ./resources
-COPY vite.config.js ./
-
-RUN npm run build
-
-FROM php:8.4-fpm-alpine AS runtime
+FROM php:8.4-fpm-alpine AS php-base
 
 ENV APP_ENV=production \
     APP_DEBUG=false \
@@ -71,6 +44,38 @@ RUN set -eux; \
         zip; \
     apk del .build-deps; \
     mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+FROM composer:2 AS composer-bin
+
+FROM php-base AS vendor
+
+WORKDIR /app
+
+COPY --from=composer-bin /usr/bin/composer /usr/local/bin/composer
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-progress \
+    --no-scripts \
+    --optimize-autoloader \
+    --prefer-dist
+
+FROM node:22-alpine AS assets
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+
+COPY --from=vendor /app/vendor ./vendor
+COPY resources ./resources
+COPY vite.config.js ./
+
+RUN npm run build
+
+FROM php-base AS runtime
 
 WORKDIR /var/www/html
 
