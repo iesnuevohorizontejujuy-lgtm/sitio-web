@@ -6,7 +6,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [careers, news] = await Promise.all([getCareers(), getInstitutionalNews()]);
-  const staticRoutes = ["", "/institucion", "/carreras", "/ingresantes", "/vida-institucional", "/noticias"];
+  const staticRoutes = ["", "/institucion", "/carreras", "/ingresantes", "/permisos-examen", "/vida-institucional", "/noticias"];
 
   return [
     ...staticRoutes.map((route) => ({
