@@ -33,7 +33,7 @@ class CarreraSeeder extends Seeder
         ];
 
         foreach ($careers as $index => [$name, $slug, $area]) {
-            Carrera::updateOrCreate(
+            Carrera::query()->firstOrCreate(
                 ['slug' => $slug],
                 [
                     'nombre' => $name,
@@ -47,47 +47,7 @@ class CarreraSeeder extends Seeder
             );
         }
 
-        $this->seedSoftwareCareer();
-    }
-
-    private function seedSoftwareCareer(): void
-    {
-        $career = Carrera::where('slug', 'desarrollo-de-software')->firstOrFail();
-        $career->update([
-            'descripcion_corta' => 'Formación para analizar, diseñar y desarrollar soluciones de software orientadas a necesidades reales.',
-            'resolucion' => 'Res. 2730-E-22',
-            'capacidades' => [
-                'Desarrollar aplicaciones',
-                'Diseñar y gestionar bases de datos',
-                'Administrar sistemas y redes',
-                'Aplicar criterios de seguridad informática',
-                'Participar en equipos de desarrollo de software',
-            ],
-            'salida_laboral' => [
-                'Empresas de software y áreas de desarrollo',
-                'Áreas de sistemas de organizaciones públicas y privadas',
-                'Consultoría y soporte tecnológico',
-                'Emprendimientos y proyectos propios',
-            ],
-        ]);
-
-        $subjects = [
-            1 => ['Álgebra', 'Inglés', 'EDI I', 'Metodología de la Investigación', 'Informática', 'Programación I', 'Arquitectura de Computadoras', 'Administración y Organizaciones', 'Análisis Matemático'],
-            2 => ['Inglés Técnico', 'Programación II', 'Bases de Datos', 'Sistemas Operativos', 'Redes Informáticas', 'Análisis y Diseño', 'Estructura de Datos', 'Seguridad Informática', 'Práctica Profesionalizante I', 'Estadística y Probabilidad'],
-            3 => ['EDI II', 'Ética y Deontología Profesional', 'Programación III', 'Legislación', 'Emprendedurismo Tecnológico', 'Diseño de Interface', 'Ingeniería de Software', 'Práctica Profesionalizante II'],
-        ];
-
-        $career->materias()->delete();
-
-        foreach ($subjects as $year => $names) {
-            foreach ($names as $order => $name) {
-                $career->materias()->create([
-                    'nombre' => $name,
-                    'anio' => $year,
-                    'orden' => $order + 1,
-                ]);
-            }
-        }
+        $this->call(CarreraAcademicSeeder::class);
     }
 
     private function areaDescription(string $area): string

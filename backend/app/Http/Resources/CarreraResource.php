@@ -50,6 +50,22 @@ class CarreraResource extends JsonResource
                 'alt' => $image->texto_alternativo,
                 'caption' => $image->epigrafe,
             ])->values(),
+            'social_posts' => $this->publicacionesSociales
+                ->filter(fn ($post): bool => $post->canonicalUrl() !== null)
+                ->take(3)
+                ->map(fn ($post): array => [
+                    'id' => $post->id,
+                    'platform' => $post->plataforma,
+                    'type' => $post->tipo_contenido,
+                    'title' => $post->titulo,
+                    'description' => $post->descripcion,
+                    'url' => $post->canonicalUrl(),
+                    'account' => $post->cuenta,
+                    'published_at' => $post->fecha_publicacion?->toDateString(),
+                    'button_label' => $post->texto_boton,
+                    'preview_image' => $this->publicUrl($post->imagen_previsualizacion_path),
+                    'preview_alt' => $post->imagen_previsualizacion_alt,
+                ])->values(),
             'featured' => $this->destacada,
         ];
     }

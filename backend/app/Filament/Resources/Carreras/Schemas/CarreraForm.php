@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Carreras\Schemas;
 
 use App\Models\Carrera;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -79,6 +80,94 @@ class CarreraForm
                             TextInput::make('texto_alternativo')->label('Texto alternativo')->required()->maxLength(255),
                             TextInput::make('epigrafe')->label('Epígrafe')->maxLength(255),
                         ])->columns(3)->collapsible()->maxItems(8),
+                    ]),
+                Section::make('Contenido social de la carrera')
+                    ->description('Publicaciones reales vinculadas con la carrera. En el sitio se muestran como máximo las primeras 3 que estén publicadas y autorizadas.')
+                    ->columnSpanFull()
+                    ->schema([
+                        Repeater::make('publicacionesSociales')
+                            ->label('Publicaciones sociales')
+                            ->relationship()
+                            ->orderColumn('orden')
+                            ->reorderable()
+                            ->addActionLabel('Agregar publicación social')
+                            ->schema([
+                                Select::make('plataforma')
+                                    ->required()
+                                    ->native(false)
+                                    ->default('instagram')
+                                    ->options([
+                                        'instagram' => 'Instagram',
+                                        'youtube' => 'YouTube',
+                                        'facebook' => 'Facebook',
+                                        'tiktok' => 'TikTok',
+                                    ]),
+                                Select::make('tipo_contenido')
+                                    ->label('Tipo de contenido')
+                                    ->required()
+                                    ->native(false)
+                                    ->default('reel')
+                                    ->options([
+                                        'reel' => 'Reel',
+                                        'publicacion' => 'Publicación',
+                                        'video' => 'Video',
+                                        'actividad' => 'Actividad institucional',
+                                    ]),
+                                TextInput::make('cuenta')
+                                    ->label('Cuenta o autor')
+                                    ->placeholder('@iesnuevohorizonte')
+                                    ->maxLength(120),
+                                TextInput::make('titulo')
+                                    ->label('Título editorial')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->columnSpan(2),
+                                DatePicker::make('fecha_publicacion')
+                                    ->label('Fecha de publicación')
+                                    ->native(false)
+                                    ->displayFormat('d/m/Y'),
+                                Textarea::make('descripcion')
+                                    ->label('Descripción')
+                                    ->rows(3)
+                                    ->maxLength(1000)
+                                    ->columnSpanFull(),
+                                TextInput::make('url')
+                                    ->label('Enlace público')
+                                    ->placeholder('https://www.instagram.com/reel/.../')
+                                    ->helperText('Debe ser un enlace HTTPS público de la plataforma seleccionada. No pegues el código HTML del embed.')
+                                    ->required()
+                                    ->url()
+                                    ->rules(['starts_with:https://'])
+                                    ->regex('/^https:\/\/(?:(?:www\.)?(?:instagram\.com|youtube\.com|facebook\.com|tiktok\.com)|youtu\.be|fb\.watch)\/.+/i')
+                                    ->maxLength(2048)
+                                    ->columnSpanFull(),
+                                FileUpload::make('imagen_previsualizacion_path')
+                                    ->label('Portada opcional')
+                                    ->helperText('Se muestra antes de cargar la publicación externa.')
+                                    ->disk('public')
+                                    ->directory('carreras/publicaciones-sociales')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->maxSize(5120),
+                                TextInput::make('imagen_previsualizacion_alt')
+                                    ->label('Texto alternativo de la portada')
+                                    ->maxLength(255),
+                                TextInput::make('texto_boton')
+                                    ->label('Texto del botón')
+                                    ->default('Ver en Instagram')
+                                    ->required()
+                                    ->maxLength(80),
+                                Toggle::make('uso_institucional_autorizado')
+                                    ->label('Uso institucional autorizado')
+                                    ->helperText('Confirmá que el instituto puede difundir este contenido.')
+                                    ->default(false),
+                                Toggle::make('publicada')
+                                    ->label('Visible en el sitio')
+                                    ->default(false),
+                            ])
+                            ->columns(3)
+                            ->collapsible()
+                            ->maxItems(8),
                     ]),
             ]);
     }

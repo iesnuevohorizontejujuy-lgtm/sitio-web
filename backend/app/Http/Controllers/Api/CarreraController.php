@@ -13,7 +13,7 @@ class CarreraController extends Controller
     {
         $careers = Carrera::query()
             ->publicadas()
-            ->with(['materias', 'imagenes'])
+            ->with(['materias', 'imagenes', 'publicacionesSociales' => fn ($query) => $query->publicadas()])
             ->orderBy('orden')
             ->orderBy('nombre')
             ->get();
@@ -25,7 +25,7 @@ class CarreraController extends Controller
     {
         $career = Carrera::query()
             ->publicadas()
-            ->with(['materias', 'imagenes'])
+            ->with(['materias', 'imagenes', 'publicacionesSociales' => fn ($query) => $query->publicadas()])
             ->where('slug', $slug)
             ->firstOrFail();
 

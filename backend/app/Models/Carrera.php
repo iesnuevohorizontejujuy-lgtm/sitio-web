@@ -53,6 +53,11 @@ class Carrera extends Model
         return $this->hasMany(CarreraImagen::class)->orderBy('orden');
     }
 
+    public function publicacionesSociales(): HasMany
+    {
+        return $this->hasMany(CarreraPublicacionSocial::class)->orderBy('orden');
+    }
+
     public function scopePublicadas(Builder $query): Builder
     {
         return $query->where('publicada', true);
