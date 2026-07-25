@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { academicApiFetch } from "@/lib/academic-api";
 
 const allowedDocuments = new Set(["pdf", "comprobante"]);
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export async function GET(
   _request: NextRequest,
@@ -9,7 +10,7 @@ export async function GET(
 ) {
   const { id, documento } = await context.params;
 
-  if (!/^\d+$/.test(id) || !allowedDocuments.has(documento)) {
+  if (!uuidPattern.test(id) || !allowedDocuments.has(documento)) {
     return NextResponse.json({ message: "El documento solicitado no es válido." }, { status: 404 });
   }
 

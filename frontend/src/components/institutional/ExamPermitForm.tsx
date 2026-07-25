@@ -44,6 +44,74 @@ type PersonalData = {
   phone: string;
 };
 
+type PaymentStatus = string | null;
+
+type CallOption = {
+  value: "1er Llamado" | "2do Llamado";
+  label: string;
+};
+
+type ExamPermitConfiguration = {
+  isOpen: boolean;
+  state: string;
+  name: string;
+  startsAt: string | null;
+  endsAt: string | null;
+  durationDays: number | null;
+  amount: number | null;
+  currencyId: string;
+  calls: CallOption[];
+  message: string;
+};
+
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const failedPaymentStatuses = new Set([
+  "rejected",
+  "cancelled",
+  "refunded",
+  "charged_back",
+  "payment_error",
+  "payment_mismatch",
+]);
+
+const normalizeConfiguration = (payload: UnknownRecord): ExamPermitConfiguration => ({
+  isOpen: payload.is_open === true,
+  state: String(payload.state ?? "disabled"),
+  name: String(payload.name ?? "Inscripción a permisos de examen"),
+  startsAt: payload.starts_at ? String(payload.starts_at) : null,
+  endsAt: payload.ends_at ? String(payload.ends_at) : null,
+  durationDays: payload.duration_days ? Number(payload.duration_days) : null,
+  amount: payload.amount !== undefined ? Number(payload.amount) : null,
+  currencyId: String(payload.currency_id ?? "ARS"),
+  calls: Array.isArray(payload.calls)
+    ? payload.calls
+        .filter((item): item is UnknownRecord => Boolean(item) && typeof item === "object")
+        .map((item) => ({
+          value: String(item.value) as CallOption["value"],
+          label: String(item.label ?? item.value),
+        }))
+        .filter((item) => item.value === "1er Llamado" || item.value === "2do Llamado")
+    : [],
+  message: String(payload.message ?? ""),
+});
+
+const formatDateTime = (value: string | null) =>
+  value
+    ? new Intl.DateTimeFormat("es-AR", {
+        dateStyle: "long",
+        timeStyle: "short",
+      }).format(new Date(value))
+    : "A confirmar";
+
+const formatAmount = (amount: number | null, currencyId: string) =>
+  amount === null
+    ? "A confirmar"
+    : new Intl.NumberFormat("es-AR", {
+        style: "currency",
+        currency: currencyId,
+        minimumFractionDigits: 0,
+      }).format(amount);
+
 const inputClassName =
   "h-11 rounded-lg border-[#CBD5E1] bg-white shadow-none focus-visible:border-[#2CBEE7] focus-visible:ring-[#2CBEE7]/20";
 
@@ -85,13 +153,13 @@ const responseMessage = async (response: Response, fallback: string) => {
 
 export function ExamPermitForm() {
   const searchParams = useSearchParams();
-  const returnedPermitId = searchParams.get("ficha_id");
-  const returnedFromPayment = searchParams.get("step") === "3" && /^\d+$/.test(returnedPermitId ?? "");
+  const returnedPermitToken = searchParams.get("permit");
+  const returnedFromPayment = uuidPattern.test(returnedPermitToken ?? "");
 
   const [careers, setCareers] = useState<CareerOption[]>([]);
   const [subjects, setSubjects] = useState<SubjectOption[]>([]);
   const [careerId, setCareerId] = useState("");
-  const [call, setCall] = useState("1er Llamado");
+  const [call, setCall] = useState("");
   const [personalData, setPersonalData] = useState<PersonalData>({
     surname: "",
     names: "",
@@ -100,12 +168,17 @@ export function ExamPermitForm() {
   });
   const [selections, setSelections] = useState<Record<number, SubjectSelection>>({});
   const [accepted, setAccepted] = useState(false);
-  const [loadingCareers, setLoadingCareers] = useState(true);
+  const [loadingConfiguration, setLoadingConfiguration] = useState(true);
+  const [configuration, setConfiguration] = useState<ExamPermitConfiguration | null>(null);
+  const [configurationError, setConfigurationError] = useState("");
+  const [loadingCareers, setLoadingCareers] = useState(false);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [catalogError, setCatalogError] = useState("");
   const [formError, setFormError] = useState("");
-  const [permitId, setPermitId] = useState<string | null>(returnedFromPayment ? returnedPermitId : null);
+  const [permitToken, setPermitToken] = useState<string | null>(returnedFromPayment ? returnedPermitToken : null);
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(returnedFromPayment ? "checking" : null);
+  const [statusError, setStatusError] = useState("");
 
   const selectedSubjects = useMemo(
     () => subjects.filter((subject) => selections[subject.id]),
@@ -136,8 +209,72 @@ export function ExamPermitForm() {
   };
 
   useEffect(() => {
-    void loadCareers();
+    const loadConfiguration = async () => {
+      setLoadingConfiguration(true);
+      setConfigurationError("");
+
+      try {
+        const response = await fetch("/api/permisos-examen/configuracion", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(await responseMessage(response, "No pudimos consultar la convocatoria."));
+        }
+
+        const nextConfiguration = normalizeConfiguration((await response.json()) as UnknownRecord);
+        setConfiguration(nextConfiguration);
+        setCall(nextConfiguration.calls[0]?.value ?? "");
+      } catch (error) {
+        setConfigurationError(error instanceof Error ? error.message : "No pudimos consultar la convocatoria.");
+      } finally {
+        setLoadingConfiguration(false);
+      }
+    };
+
+    void loadConfiguration();
   }, []);
+
+  useEffect(() => {
+    if (configuration?.isOpen && careers.length === 0 && !loadingCareers) {
+      void loadCareers();
+    }
+  }, [configuration?.isOpen, careers.length, loadingCareers]);
+
+  useEffect(() => {
+    if (!permitToken) return;
+
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const pollPaymentStatus = async () => {
+      try {
+        const response = await fetch(`/api/permisos-examen/${permitToken}`, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(await responseMessage(response, "No pudimos consultar el estado del pago."));
+        }
+
+        const data = (await response.json()) as UnknownRecord;
+        const status = String(data.payment_status ?? "pending");
+
+        if (cancelled) return;
+        setPaymentStatus(status);
+        setStatusError("");
+
+        if (status !== "approved" && !failedPaymentStatuses.has(status)) {
+          timer = setTimeout(pollPaymentStatus, 2500);
+        }
+      } catch (error) {
+        if (cancelled) return;
+        setStatusError(error instanceof Error ? error.message : "No pudimos consultar el estado del pago.");
+        timer = setTimeout(pollPaymentStatus, 5000);
+      }
+    };
+
+    void pollPaymentStatus();
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [permitToken]);
 
   useEffect(() => {
     if (!careerId) {
@@ -241,14 +378,17 @@ export function ExamPermitForm() {
 
       const data = (await response.json()) as UnknownRecord;
       const paymentUrl = String(data.init_point ?? "");
-      const newPermitId = String(data.ficha_id ?? "");
+      const newPermitToken = String(data.permit_token ?? "");
 
       if (paymentUrl) {
         window.location.assign(paymentUrl);
         return;
       }
 
-      if (newPermitId) setPermitId(newPermitId);
+      if (uuidPattern.test(newPermitToken)) {
+        setPermitToken(newPermitToken);
+        setPaymentStatus(String(data.payment_status ?? "pending"));
+      }
       else setFormError("El permiso fue recibido, pero no obtuvimos el enlace de pago.");
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "No pudimos registrar el permiso.");
@@ -257,32 +397,113 @@ export function ExamPermitForm() {
     }
   };
 
-  if (permitId) {
+  if (permitToken) {
+    const approved = paymentStatus === "approved";
+    const failed = paymentStatus ? failedPaymentStatuses.has(paymentStatus) : false;
+
     return (
-      <div className="rounded-2xl border border-[#B9D6C2] bg-[#F3FAF5] p-7 md:p-10">
-        <div className="flex size-14 items-center justify-center rounded-full bg-[#DDF2E3] text-[#176B3A]">
-          <CheckCircle2 className="size-7" />
+      <div className={`rounded-2xl border p-7 md:p-10 ${approved ? "border-[#B9D6C2] bg-[#F3FAF5]" : failed ? "border-[#F2C7C7] bg-[#FFF7F7]" : "border-[#B8D8E8] bg-[#F3FAFC]"}`}>
+        <div className={`flex size-14 items-center justify-center rounded-full ${approved ? "bg-[#DDF2E3] text-[#176B3A]" : failed ? "bg-[#FBE5E5] text-[#8B2C2C]" : "bg-[#E0ECF8] text-[#0A496C]"}`}>
+          {approved ? <CheckCircle2 className="size-7" /> : failed ? <AlertCircle className="size-7" /> : <Loader2 className="size-7 animate-spin" />}
         </div>
-        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-[#176B3A]">Solicitud registrada</p>
-        <h2 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#123A50]">Estamos verificando tu pago</h2>
-        <p className="mt-4 max-w-2xl leading-7 text-[#52606D]">
-          Mercado Pago notificará al sistema académico. Cuando el pago figure aprobado podrás descargar la ficha y el comprobante.
+        <p className={`mt-6 text-xs font-semibold uppercase tracking-[0.18em] ${approved ? "text-[#176B3A]" : failed ? "text-[#8B2C2C]" : "text-[#0A496C]"}`}>
+          {approved ? "Pago acreditado" : failed ? "Pago no acreditado" : "Solicitud registrada"}
         </p>
-        <div className="mt-7 grid gap-3 sm:grid-cols-2">
-          <Button asChild className="h-12 bg-[#0A496C] hover:bg-[#073A57]">
-            <a href={`/api/permisos-examen/${permitId}/pdf`}><Download /> Descargar ficha</a>
+        <h2 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#123A50]">
+          {approved ? "Tu permiso está disponible" : failed ? "No pudimos confirmar el pago" : "Estamos verificando tu pago"}
+        </h2>
+        <p className="mt-4 max-w-2xl leading-7 text-[#52606D]">
+          {approved
+            ? "Mercado Pago confirmó la acreditación. Ya podés descargar la ficha y el comprobante."
+            : failed
+              ? "La operación fue rechazada, cancelada o no coincide con el importe esperado. Podés iniciar una nueva solicitud."
+              : "Mercado Pago notificará al sistema académico. Esta pantalla se actualiza automáticamente cuando llega la acreditación."}
+        </p>
+        {approved && (
+          <div className="mt-7 grid gap-3 sm:grid-cols-2">
+            <Button asChild className="h-12 bg-[#0A496C] hover:bg-[#073A57]">
+              <a href={`/api/permisos-examen/${permitToken}/pdf`}><Download /> Descargar ficha</a>
+            </Button>
+            <Button asChild variant="outline" className="h-12 border-[#0A496C] text-[#0A496C]">
+              <a href={`/api/permisos-examen/${permitToken}/comprobante`}><FileText /> Descargar comprobante</a>
+            </Button>
+          </div>
+        )}
+        {failed && (
+          <Button type="button" className="mt-7 h-12 bg-[#0A496C] hover:bg-[#073A57]" onClick={() => window.location.assign("/permisos-examen")}>
+            Iniciar una nueva solicitud
           </Button>
-          <Button asChild variant="outline" className="h-12 border-[#0A496C] text-[#0A496C]">
-            <a href={`/api/permisos-examen/${permitId}/comprobante`}><FileText /> Descargar comprobante</a>
-          </Button>
-        </div>
-        <p className="mt-4 text-sm text-[#64748B]">Si el pago todavía está pendiente, esperá unos minutos y volvé a intentar.</p>
+        )}
+        {statusError && <p role="alert" className="mt-5 text-sm text-[#8B2C2C]">{statusError}</p>}
+        {!approved && !failed && <p className="mt-5 text-sm text-[#64748B]">Podés dejar esta pestaña abierta; la verificación continuará automáticamente.</p>}
+      </div>
+    );
+  }
+
+  if (loadingConfiguration) {
+    return (
+      <div className="flex items-center justify-center gap-3 rounded-2xl border border-[#D8E1E8] bg-white p-12 text-[#52606D]">
+        <Loader2 className="size-5 animate-spin text-[#0A496C]" /> Consultando convocatoria…
+      </div>
+    );
+  }
+
+  if (configurationError || !configuration) {
+    return (
+      <div className="rounded-2xl border border-[#F2C7C7] bg-[#FFF7F7] p-7 md:p-10">
+        <AlertCircle className="size-8 text-[#8B2C2C]" />
+        <h2 className="mt-5 text-2xl font-semibold text-[#123A50]">No pudimos consultar las inscripciones</h2>
+        <p className="mt-3 text-[#52606D]">{configurationError || "Intentá nuevamente en unos minutos."}</p>
+        <Button type="button" className="mt-6 bg-[#0A496C]" onClick={() => window.location.reload()}>
+          <RefreshCw /> Reintentar
+        </Button>
+      </div>
+    );
+  }
+
+  if (!configuration.isOpen) {
+    const scheduled = configuration.state === "programada";
+
+    return (
+      <div className="rounded-2xl border border-[#D8E1E8] bg-white p-7 md:p-10">
+        <CalendarDays className="size-10 text-[#0A496C]" />
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-[#0A496C]">
+          {scheduled ? "Próxima convocatoria" : "Inscripciones cerradas"}
+        </p>
+        <h2 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#123A50]">{configuration.name}</h2>
+        <p className="mt-4 max-w-2xl leading-7 text-[#52606D]">
+          {configuration.message || (scheduled
+            ? `El formulario se habilitará el ${formatDateTime(configuration.startsAt)}.`
+            : "En este momento no hay una convocatoria habilitada para solicitar permisos de examen.")}
+        </p>
+        {configuration.endsAt && (
+          <p className="mt-5 text-sm font-medium text-[#64748B]">
+            Vigencia programada: {formatDateTime(configuration.startsAt)} al {formatDateTime(configuration.endsAt)}.
+          </p>
+        )}
       </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      <section className="rounded-2xl border border-[#B8D8E8] bg-[#F3FAFC] p-6 md:p-8">
+        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-start">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#0A496C]">Convocatoria abierta</p>
+            <h2 className="mt-2 text-2xl font-semibold text-[#123A50]">{configuration.name}</h2>
+            <p className="mt-2 text-sm leading-6 text-[#52606D]">
+              Disponible hasta el {formatDateTime(configuration.endsAt)}
+              {configuration.durationDays ? ` · Duración: ${configuration.durationDays} días` : ""}
+            </p>
+            {configuration.message && <p className="mt-3 text-sm leading-6 text-[#52606D]">{configuration.message}</p>}
+          </div>
+          <div className="shrink-0 rounded-xl bg-white px-5 py-4 text-right shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#64748B]">Arancel</p>
+            <p className="mt-1 text-2xl font-semibold text-[#0A496C]">{formatAmount(configuration.amount, configuration.currencyId)}</p>
+          </div>
+        </div>
+      </section>
       <section className="rounded-2xl border border-[#D8E1E8] bg-white p-6 md:p-8">
         <div className="flex items-start gap-4">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#E0ECF8] font-semibold text-[#0A496C]">1</span>
@@ -338,8 +559,9 @@ export function ExamPermitForm() {
           <div className="space-y-2">
             <Label htmlFor="permit-call">Instancia</Label>
             <select id="permit-call" required className={selectClassName} value={call} onChange={(event) => setCall(event.target.value)}>
-              <option value="1er Llamado">Primer llamado</option>
-              <option value="2do Llamado">Segundo llamado</option>
+              {configuration.calls.map((callOption) => (
+                <option key={callOption.value} value={callOption.value}>{callOption.label}</option>
+              ))}
             </select>
           </div>
         </div>

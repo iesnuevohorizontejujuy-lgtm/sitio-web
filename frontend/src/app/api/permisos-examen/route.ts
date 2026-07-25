@@ -34,7 +34,16 @@ export async function POST(request: NextRequest) {
     isFilledString(payload.llamado) &&
     Array.isArray(payload.materias) &&
     payload.materias.length >= 1 &&
-    payload.materias.length <= 8;
+    payload.materias.length <= 8 &&
+    payload.materias.every((item) => {
+      if (!item || typeof item !== "object") return false;
+      const materia = item as Record<string, unknown>;
+      return (
+        /^\d+$/.test(String(materia.materia_id)) &&
+        (materia.condicion === "REGULAR" || materia.condicion === "LIBRE") &&
+        /^\d{4}-\d{2}-\d{2}$/.test(String(materia.fecha_examen))
+      );
+    });
 
   if (!valid) {
     return NextResponse.json(
