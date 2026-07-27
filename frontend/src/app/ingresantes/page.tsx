@@ -108,7 +108,7 @@ export default async function AdmissionsPage() {
 
           <MotionReveal className="relative lg:col-span-7" delay={0.1}>
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#B7CADB] bg-[#E0ECF8]">
-              <Image src="/institutional/students-collaboration.png" alt="Estudiantes del IES Nuevo Horizonte compartiendo una actividad" fill priority sizes="(max-width: 1024px) 100vw, 58vw" className="object-cover" />
+              <Image src="/instituto.jpg" alt="Instalaciones del IES Nuevo Horizonte" fill priority sizes="(max-width: 1024px) 100vw, 58vw" className="object-cover" />
             </div>
             <div className="absolute bottom-5 left-5 max-w-[270px] border-l-4 border-[#2CBEE7] bg-white p-5 shadow-[0_4px_20px_rgba(10,73,108,0.12)] sm:bottom-7 sm:left-7">
               <p className="font-semibold text-[#0A496C]">No estás solo para elegir</p>

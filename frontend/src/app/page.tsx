@@ -124,7 +124,7 @@ export default async function HomePage() {
       <section id="institucion" className="scroll-mt-28 bg-[#0A496C] py-20 text-white md:py-24">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-2 lg:gap-20 lg:px-8">
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/15">
-            <Image src="/institutional/students-collaboration.png" alt="Estudiantes trabajando en una actividad académica" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+            <Image src="/instituto.jpg" alt="Instalaciones del IES Nuevo Horizonte" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
           </div>
           <div>
             <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#2CBEE7]"><span className="h-0.5 w-10 bg-[#2CBEE7]" />Nuestra institución</p>

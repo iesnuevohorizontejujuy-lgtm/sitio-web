@@ -26,10 +26,10 @@ interface CareerDetailPageProps {
 }
 
 const areaImages: Record<CareerArea, string> = {
-  Salud: "/institutional/professor-classroom.png",
-  Tecnología: "/institutional/software-students.png",
-  Gestión: "/institutional/students-collaboration.png",
-  "Sociedad y comunicación": "/institutional/students-collaboration.png",
+  Salud: "/instituto.jpg",
+  Tecnología: "/instituto.jpg",
+  Gestión: "/instituto.jpg",
+  "Sociedad y comunicación": "/instituto.jpg",
   "Actividad física": "/instituto.jpg",
 };
 

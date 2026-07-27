@@ -38,8 +38,14 @@ export async function POST(request: NextRequest) {
     payload.materias.every((item) => {
       if (!item || typeof item !== "object") return false;
       const materia = item as Record<string, unknown>;
+      const officialSubject = /^\d+$/.test(String(materia.materia_id));
+      const manualSubject =
+        isFilledString(materia.nombre) &&
+        /^\d+$/.test(String(materia.anio)) &&
+        Number(materia.anio) >= 1 &&
+        Number(materia.anio) <= 6;
       return (
-        /^\d+$/.test(String(materia.materia_id)) &&
+        (officialSubject || manualSubject) &&
         (materia.condicion === "REGULAR" || materia.condicion === "LIBRE") &&
         /^\d{4}-\d{2}-\d{2}$/.test(String(materia.fecha_examen))
       );

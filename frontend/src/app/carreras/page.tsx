@@ -24,7 +24,7 @@ export default async function CareersPage() {
             <p className="mt-7 max-w-xl text-lg leading-8 text-[#52606D]">Descubrí propuestas educativas diseñadas para responder a las necesidades profesionales de Jujuy, con formación humana, técnica y práctica.</p>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#CBD5E1] bg-[#E0ECF8] lg:col-span-7">
-            <Image src="/institutional/software-students.png" alt="Estudiantes trabajando en equipo" fill priority sizes="(max-width: 1024px) 100vw, 58vw" className="object-cover" />
+            <Image src="/instituto.jpg" alt="Instalaciones del IES Nuevo Horizonte" fill priority sizes="(max-width: 1024px) 100vw, 58vw" className="object-cover" />
           </div>
         </div>
       </section>

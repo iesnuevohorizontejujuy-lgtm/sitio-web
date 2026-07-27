@@ -12,6 +12,8 @@ import {
   Loader2,
   RefreshCw,
   ShieldCheck,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -23,6 +25,7 @@ type UnknownRecord = Record<string, unknown>;
 type CareerOption = {
   id: number;
   name: string;
+  allowsManualSubjects: boolean;
 };
 
 type SubjectOption = {
@@ -35,6 +38,12 @@ type SubjectOption = {
 type SubjectSelection = {
   condition: "REGULAR" | "LIBRE";
   examDate: string;
+};
+
+type ManualSubjectSelection = SubjectSelection & {
+  id: number;
+  name: string;
+  year: string;
 };
 
 type PersonalData = {
@@ -132,6 +141,7 @@ const normalizeCareers = (payload: unknown): CareerOption[] =>
     .map((item) => ({
       id: Number(item.id ?? 0),
       name: String(item.nombre ?? item.title ?? "").trim(),
+      allowsManualSubjects: item.permite_materias_manuales === true,
     }))
     .filter((item) => item.id > 0 && item.name.length > 0);
 
@@ -167,6 +177,7 @@ export function ExamPermitForm() {
     phone: "",
   });
   const [selections, setSelections] = useState<Record<number, SubjectSelection>>({});
+  const [manualSubjects, setManualSubjects] = useState<ManualSubjectSelection[]>([]);
   const [accepted, setAccepted] = useState(false);
   const [loadingConfiguration, setLoadingConfiguration] = useState(true);
   const [configuration, setConfiguration] = useState<ExamPermitConfiguration | null>(null);
@@ -184,6 +195,12 @@ export function ExamPermitForm() {
     () => subjects.filter((subject) => selections[subject.id]),
     [selections, subjects],
   );
+  const selectedCareer = useMemo(
+    () => careers.find((career) => String(career.id) === careerId) ?? null,
+    [careerId, careers],
+  );
+  const usesManualSubjects = selectedCareer?.allowsManualSubjects === true;
+  const subjectCount = usesManualSubjects ? manualSubjects.length : selectedSubjects.length;
 
   const subjectsByYear = useMemo(() => {
     const groups = new Map<number, SubjectOption[]>();
@@ -280,6 +297,16 @@ export function ExamPermitForm() {
     if (!careerId) {
       setSubjects([]);
       setSelections({});
+      setManualSubjects([]);
+      return;
+    }
+
+    if (usesManualSubjects) {
+      setSubjects([]);
+      setSelections({});
+      setManualSubjects([{ id: Date.now(), name: "", year: "", condition: "REGULAR", examDate: "" }]);
+      setLoadingSubjects(false);
+      setCatalogError("");
       return;
     }
 
@@ -302,7 +329,23 @@ export function ExamPermitForm() {
     };
 
     void loadSubjects();
-  }, [careerId]);
+  }, [careerId, usesManualSubjects]);
+
+  const addManualSubject = () => {
+    if (manualSubjects.length >= 8) {
+      setFormError("Podés cargar hasta ocho espacios curriculares por permiso.");
+      return;
+    }
+    setManualSubjects((current) => [...current, { id: Date.now(), name: "", year: "", condition: "REGULAR", examDate: "" }]);
+  };
+
+  const updateManualSubject = (id: number, patch: Partial<ManualSubjectSelection>) => {
+    setManualSubjects((current) => current.map((subject) => subject.id === id ? { ...subject, ...patch } : subject));
+  };
+
+  const removeManualSubject = (id: number) => {
+    setManualSubjects((current) => current.filter((subject) => subject.id !== id));
+  };
 
   const toggleSubject = (subjectId: number, checked: boolean) => {
     setFormError("");
@@ -334,11 +377,15 @@ export function ExamPermitForm() {
     event.preventDefault();
     setFormError("");
 
-    if (selectedSubjects.length === 0) {
+    if (subjectCount === 0) {
       setFormError("Seleccioná al menos una materia para continuar.");
       return;
     }
-    if (selectedSubjects.some((subject) => !selections[subject.id]?.examDate)) {
+    if (usesManualSubjects && manualSubjects.some((subject) => !subject.name.trim() || !subject.year || !subject.examDate)) {
+      setFormError("Completá el nombre, año y fecha de examen de cada espacio curricular.");
+      return;
+    }
+    if (!usesManualSubjects && selectedSubjects.some((subject) => !selections[subject.id]?.examDate)) {
       setFormError("Indicá la fecha de examen de cada materia seleccionada.");
       return;
     }
@@ -360,7 +407,12 @@ export function ExamPermitForm() {
           telefono: personalData.phone.trim(),
           fecha: new Date().toISOString().slice(0, 10),
           llamado: call,
-          materias: selectedSubjects.map((subject, index) => ({
+          materias: usesManualSubjects ? manualSubjects.map((subject) => ({
+            nombre: subject.name.trim(),
+            anio: Number(subject.year),
+            condicion: subject.condition,
+            fecha_examen: subject.examDate,
+          })) : selectedSubjects.map((subject, index) => ({
             materia_id: subject.id,
             num_materia: subject.order || String(index + 1),
             nombre: subject.name,
@@ -576,9 +628,51 @@ export function ExamPermitForm() {
               <p className="mt-1 text-sm leading-6 text-[#64748B]">Seleccioná entre una y ocho materias.</p>
             </div>
           </div>
-          <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-xs font-semibold text-[#52606D]">{selectedSubjects.length}/8</span>
+          <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-xs font-semibold text-[#52606D]">{subjectCount}/8</span>
         </div>
 
+        {usesManualSubjects && (
+          <div className="mt-7 space-y-4">
+            <div className="rounded-xl border border-[#F2D6A2] bg-[#FFF9ED] p-4 text-sm leading-6 text-[#7A5420]">
+              <span className="font-semibold">Esta carrera todavía no tiene el plan de estudios cargado.</span>{" "}
+              Escribí el nombre de cada espacio curricular tal como figura en tu documentación.
+            </div>
+            {manualSubjects.map((subject, index) => (
+              <div key={subject.id} className="grid gap-4 rounded-xl border border-[#D8E1E8] bg-[#F7FAFC] p-4 md:grid-cols-[1fr_120px_150px_180px_auto] md:items-end">
+                <div className="space-y-1.5">
+                  <Label htmlFor={`manual-name-${subject.id}`} className="text-xs">Espacio curricular {index + 1}</Label>
+                  <Input id={`manual-name-${subject.id}`} required maxLength={160} className={inputClassName} value={subject.name} onChange={(event) => updateManualSubject(subject.id, { name: event.target.value })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`manual-year-${subject.id}`} className="text-xs">Año</Label>
+                  <select id={`manual-year-${subject.id}`} required className={selectClassName} value={subject.year} onChange={(event) => updateManualSubject(subject.id, { year: event.target.value })}>
+                    <option value="">Elegir</option>
+                    {[1, 2, 3, 4, 5, 6].map((year) => <option key={year} value={year}>{year}.º</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`manual-condition-${subject.id}`} className="text-xs">Condición</Label>
+                  <select id={`manual-condition-${subject.id}`} className={selectClassName} value={subject.condition} onChange={(event) => updateManualSubject(subject.id, { condition: event.target.value as SubjectSelection["condition"] })}>
+                    <option value="REGULAR">Regular</option>
+                    <option value="LIBRE">Libre</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`manual-date-${subject.id}`} className="text-xs">Fecha del examen</Label>
+                  <Input id={`manual-date-${subject.id}`} type="date" required className={inputClassName} value={subject.examDate} onChange={(event) => updateManualSubject(subject.id, { examDate: event.target.value })} />
+                </div>
+                <Button type="button" variant="outline" size="icon" disabled={manualSubjects.length === 1} onClick={() => removeManualSubject(subject.id)} aria-label={`Quitar espacio curricular ${index + 1}`}>
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
+            ))}
+            <Button type="button" variant="outline" disabled={manualSubjects.length >= 8} onClick={addManualSubject} className="border-[#0A496C] text-[#0A496C]">
+              <Plus className="size-4" /> Agregar otro espacio curricular
+            </Button>
+          </div>
+        )}
+
+        {!usesManualSubjects && <>
         {loadingSubjects && <div className="mt-8 flex items-center justify-center gap-2 py-8 text-sm text-[#64748B]"><Loader2 className="size-4 animate-spin" /> Cargando materias…</div>}
         {!loadingSubjects && careerId && subjects.length === 0 && (
           <div className="mt-7 rounded-xl border border-[#F2D6A2] bg-[#FFF9ED] p-4 text-sm leading-6 text-[#7A5420]">
@@ -635,6 +729,7 @@ export function ExamPermitForm() {
             </div>
           </div>
         )}
+        </>}
       </section>
 
       <section className="rounded-2xl bg-[#073A57] p-6 text-white md:p-8">
@@ -653,7 +748,7 @@ export function ExamPermitForm() {
 
       {formError && <div role="alert" className="flex items-start gap-2 rounded-xl border border-[#F2C7C7] bg-[#FFF7F7] p-4 text-sm text-[#8B2C2C]"><AlertCircle className="mt-0.5 size-4 shrink-0" /> {formError}</div>}
 
-      <Button type="submit" disabled={submitting || loadingCareers || loadingSubjects || careers.length === 0 || selectedSubjects.length === 0} className="h-14 w-full rounded-xl bg-[#0A496C] text-base font-semibold hover:bg-[#073A57]">
+      <Button type="submit" disabled={submitting || loadingCareers || loadingSubjects || careers.length === 0 || subjectCount === 0} className="h-14 w-full rounded-xl bg-[#0A496C] text-base font-semibold hover:bg-[#073A57]">
         {submitting ? <><Loader2 className="animate-spin" /> Registrando permiso…</> : <><CreditCard /> Continuar al pago</>}
       </Button>
       <p className="flex items-center justify-center gap-2 text-center text-xs text-[#64748B]"><CalendarDays className="size-4" /> Verificá las fechas publicadas por el instituto antes de enviar el permiso.</p>
