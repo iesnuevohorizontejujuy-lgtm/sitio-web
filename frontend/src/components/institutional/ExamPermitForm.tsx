@@ -412,14 +412,10 @@ export function ExamPermitForm() {
             anio: Number(subject.year),
             condicion: subject.condition,
             fecha_examen: subject.examDate,
-          })) : selectedSubjects.map((subject, index) => ({
+          })) : selectedSubjects.map((subject) => ({
             materia_id: subject.id,
-            num_materia: subject.order || String(index + 1),
-            nombre: subject.name,
-            anio: subject.year || "",
             condicion: selections[subject.id].condition,
             fecha_examen: selections[subject.id].examDate,
-            llamado: call,
           })),
         }),
       });
@@ -647,7 +643,7 @@ export function ExamPermitForm() {
                   <Label htmlFor={`manual-year-${subject.id}`} className="text-xs">Año</Label>
                   <select id={`manual-year-${subject.id}`} required className={selectClassName} value={subject.year} onChange={(event) => updateManualSubject(subject.id, { year: event.target.value })}>
                     <option value="">Elegir</option>
-                    {[1, 2, 3, 4, 5, 6].map((year) => <option key={year} value={year}>{year}.º</option>)}
+                    {[1, 2, 3].map((year) => <option key={year} value={year}>{year}.º</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5">

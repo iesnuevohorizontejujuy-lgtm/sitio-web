@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         isFilledString(materia.nombre) &&
         /^\d+$/.test(String(materia.anio)) &&
         Number(materia.anio) >= 1 &&
-        Number(materia.anio) <= 6;
+        Number(materia.anio) <= 3;
       return (
         (officialSubject || manualSubject) &&
         (materia.condicion === "REGULAR" || materia.condicion === "LIBRE") &&

@@ -29,7 +29,7 @@ const steps = [
   {
     icon: Search,
     title: "Explorá las carreras",
-    text: "Compará áreas, duración, modalidad, perfil profesional y plan de estudios.",
+    text: "Conocé las áreas, la modalidad, el perfil profesional y el plan de estudios de cada propuesta.",
   },
   {
     icon: MessageCircleQuestion,
