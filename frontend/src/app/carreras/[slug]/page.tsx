@@ -1,209 +1,104 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { notFound } from "next/navigation";
-import {
-  ArrowLeft,
-  BriefcaseBusiness,
-  CheckCircle2,
-  Clock3,
-  Download,
-  FileText,
-  GraduationCap,
-  MapPin,
-  UsersRound,
-} from "lucide-react";
-import { StudyPlan } from "@/components/institutional/StudyPlan";
-import { CareerGallery } from "@/components/institutional/CareerGallery";
-import { CareerSocialShowcase } from "@/components/institutional/CareerSocialShowcase";
-import { CareerInquiryForm } from "@/components/institutional/CareerInquiryForm";
+import { CareerAdmissionSection, CareerMobileAdmissionBar } from "@/components/institutional/CareerAdmissionSection";
 import { CareerCard } from "@/components/institutional/CareerCard";
+import { CareerDetailHero } from "@/components/institutional/CareerDetailHero";
+import { CareerDocuments } from "@/components/institutional/CareerDocuments";
+import { CareerExperienceSection } from "@/components/institutional/CareerExperienceSection";
+import { CareerProfessionalOverview } from "@/components/institutional/CareerProfessionalOverview";
+import { CareerSectionNav } from "@/components/institutional/CareerSectionNav";
+import { StudyPlan } from "@/components/institutional/StudyPlan";
 import { getCareer, getCareers } from "@/lib/careers";
-import type { CareerArea } from "@/types/career";
 
 interface CareerDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const areaImages: Record<CareerArea, string> = {
-  Salud: "/instituto.jpg",
-  Tecnología: "/instituto.jpg",
-  Gestión: "/instituto.jpg",
-  "Sociedad y comunicación": "/instituto.jpg",
-  "Actividad física": "/instituto.jpg",
-};
-
 export async function generateMetadata({ params }: CareerDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
   const career = await getCareer(slug);
-  if (!career) return { title: "Carrera no encontrada | IES Nuevo Horizonte" };
-  return { title: `${career.title} | IES Nuevo Horizonte`, description: career.description };
+
+  if (!career) {
+    return { title: "Carrera no encontrada", robots: { index: false, follow: false } };
+  }
+
+  return {
+    title: career.title,
+    description: career.description,
+    alternates: { canonical: `/carreras/${career.slug}` },
+    openGraph: {
+      type: "website",
+      title: career.title,
+      description: career.description,
+      url: `/carreras/${career.slug}`,
+      images: [{
+        url: career.image ?? "/instituto.jpg",
+        alt: `Estudiantes de ${career.shortTitle || career.title}`,
+      }],
+    },
+  };
 }
 
 export default async function CareerDetailPage({ params }: CareerDetailPageProps) {
   const { slug } = await params;
   const [career, careers] = await Promise.all([getCareer(slug), getCareers()]);
+
   if (!career) notFound();
 
   const shortTitle = career.shortTitle || career.title.replace("Tecnicatura Superior en ", "");
+  const hasExperiences = career.socialPosts.length > 0 || career.gallery.length > 0;
   const relatedCareers = careers
     .filter((item) => item.slug !== career.slug && item.area === career.area)
     .slice(0, 3);
 
   return (
-    <main className="institutional-shell bg-[#F8FAFD] text-[#121C28]">
-      <section className="border-b border-[#D8E1E8] bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-5 lg:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-            <nav aria-label="Migas de pan" className="text-[#64748B]">
-              <Link href="/" className="hover:text-[#0A496C]">Inicio</Link><span className="mx-2">/</span><Link href="/carreras" className="hover:text-[#0A496C]">Carreras</Link><span className="mx-2">/</span><span className="text-[#0A496C]">{shortTitle}</span>
-            </nav>
-            <Link href="/carreras" className="inline-flex items-center gap-2 font-semibold text-[#0A496C]"><ArrowLeft className="size-4" />Volver a carreras</Link>
-          </div>
-        </div>
-      </section>
+    <main className="institutional-shell pb-20 text-[#121C28] md:pb-0">
+      <CareerDetailHero career={career} shortTitle={shortTitle} />
+      <CareerSectionNav shortTitle={shortTitle} hasExperiences={hasExperiences} />
 
-      <section className="bg-white">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-12 lg:px-8 lg:py-20">
-          <div className="lg:col-span-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">{career.area}</p>
-            <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-[-0.035em] text-[#0A496C] sm:text-5xl">{career.title}</h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-[#52606D]">{career.description}</p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a href="#inscripcion" className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#0A496C] px-6 py-3 text-sm font-semibold text-white hover:bg-[#073A57]">Inscribirme en {shortTitle}</a>
-              <a href={(career.socialPosts.length > 0 || career.gallery.length > 0) ? "#experiencias" : "#formacion"} className="inline-flex min-h-12 items-center justify-center rounded-lg border border-[#0A496C] px-6 py-3 text-sm font-semibold text-[#0A496C] hover:bg-[#E0ECF8]">Conocer la carrera</a>
-            </div>
-          </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#CBD5E1] bg-[#E0ECF8] lg:col-span-6">
-            <Image src={career.image ?? areaImages[career.area]} alt={`Estudiantes de ${shortTitle}`} fill priority unoptimized={Boolean(career.image)} sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
-          </div>
-        </div>
-      </section>
+      {hasExperiences ? <CareerExperienceSection career={career} shortTitle={shortTitle} /> : null}
 
-      <section className="border-y border-[#D8E1E8] bg-[#EAF2FB]">
-        <div className="mx-auto grid max-w-7xl gap-7 px-5 py-8 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
-          <AcademicDatum icon={Clock3} label="Duración" value={career.duration} />
-          <AcademicDatum icon={MapPin} label="Modalidad" value={career.modality} />
-          <AcademicDatum icon={FileText} label="Resolución" value={career.resolutionCode ?? "Consultar"} />
-          <AcademicDatum icon={GraduationCap} label="Título" value={career.awardedTitle || "Título oficial"} />
-        </div>
-      </section>
+      <CareerProfessionalOverview career={career} />
 
-      {(career.socialPosts.length > 0 || career.gallery.length > 0) && (
-        <section id="experiencias" className="scroll-mt-28 border-b border-[#D8E1E8] bg-white py-20">
-          <div className="mx-auto max-w-7xl px-5 lg:px-8">
-            <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-              <div className="max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Conocé la carrera desde adentro</p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Actividades y experiencias reales</h2>
-                <p className="mt-4 max-w-2xl leading-7 text-[#52606D]">Estudiantes y egresados comparten prácticas, proyectos y momentos que forman parte de la vida cotidiana de {shortTitle}.</p>
-              </div>
-              <a href="#formacion" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C] underline decoration-[#2CBEE7] decoration-2 underline-offset-4">Ver información académica <ArrowLeft className="size-4 rotate-180" /></a>
-            </div>
-
-            {career.socialPosts.length > 0 && (
-              <div className="mt-12">
-                <div className="mb-6 flex items-center gap-3">
-                  <span className="h-px w-10 bg-[#2CBEE7]" aria-hidden="true" />
-                  <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#0A496C]">Voces de la comunidad</h3>
-                </div>
-                <CareerSocialShowcase posts={career.socialPosts} />
-              </div>
-            )}
-
-            {career.gallery.length > 0 && (
-              <div className={career.socialPosts.length > 0 ? "mt-16 border-t border-[#D8E1E8] pt-12" : "mt-12"}>
-                <div className="mb-6 flex items-center gap-3">
-                  <span className="h-px w-10 bg-[#2CBEE7]" aria-hidden="true" />
-                  <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#0A496C]">Prácticas y actividades</h3>
-                </div>
-                <CareerGallery images={career.gallery} />
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      <section id="formacion" className="scroll-mt-28 py-20">
-        <div className="mx-auto grid max-w-7xl gap-8 px-5 lg:grid-cols-12 lg:px-8">
-          <article className="border border-[#CBD5E1] bg-white p-7 md:p-10 lg:col-span-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Tu formación</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C]">Perfil profesional</h2>
-            {career.content ? (
-              <div className="career-rich-text mt-6 leading-7 text-[#52606D]" dangerouslySetInnerHTML={{ __html: career.content }} />
-            ) : (
-              <p className="mt-6 leading-7 text-[#52606D]">La carrera brinda herramientas técnicas y profesionales para desempeñarte con responsabilidad, criterio y capacidad de adaptación en su campo específico.</p>
-            )}
-            {career.capabilities.length > 0 && (
-              <div className="mt-9 border-t border-[#E2E8F0] pt-7">
-                <h3 className="font-semibold text-[#0A496C]">Al finalizar vas a poder</h3>
-                <ul className="mt-5 grid gap-4 sm:grid-cols-2">
-                  {career.capabilities.map((capability) => <li key={capability} className="flex gap-3 text-sm leading-6 text-[#52606D]"><CheckCircle2 className="mt-1 size-4 shrink-0 text-[#2CBEE7]" />{capability}</li>)}
-                </ul>
-              </div>
-            )}
-          </article>
-          <aside className="bg-[#0A496C] p-7 text-white md:p-9 lg:col-span-4">
-            <BriefcaseBusiness className="size-8 text-[#2CBEE7]" />
-            <h2 className="mt-5 text-2xl font-semibold">Salida laboral</h2>
-            {career.employment.length > 0 ? (
-              <ul className="mt-6 divide-y divide-white/15">
-                {career.employment.map((item) => <li key={item} className="py-4 text-sm leading-6 text-white/75">{item}</li>)}
-              </ul>
-            ) : (
-              <p className="mt-5 text-sm leading-6 text-white/75">Los alcances profesionales específicos se publicarán desde la fuente académica oficial.</p>
-            )}
-          </aside>
-        </div>
-      </section>
-
-      <section className="border-y border-[#D8E1E8] bg-white py-20">
+      <section id="plan-estudios" aria-labelledby="study-plan-heading" className="institutional-surface-brand scroll-mt-56 border-y border-[#C6D7E5] py-20">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <div className="mx-auto mb-12 max-w-2xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Trayecto académico</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Plan de estudios</h2>
-            <p className="mt-4 leading-7 text-[#52606D]">Materias organizadas por año según la información académica oficial disponible.</p>
-          </div>
-          <StudyPlan subjects={career.subjects} />
-        </div>
-      </section>
-
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <div className="rounded-2xl bg-[#E0ECF8] p-7 md:flex md:items-center md:justify-between md:gap-8 md:p-10">
-            <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]">Documentación</p><h2 className="mt-2 text-2xl font-semibold text-[#0A496C]">Documentación oficial de la carrera</h2><p className="mt-2 text-sm leading-6 text-[#52606D]">Consultá los archivos publicados por el instituto.</p></div>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row md:mt-0">
-              <DocumentLink href={career.planStudyUrl} label="Plan de estudios" icon={Download} />
-              <DocumentLink href={career.resolutionUrl} label="Resolución ministerial" icon={FileText} />
+          <div className="grid gap-6 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A6F94]">Trayecto académico</p>
+              <h2 id="study-plan-heading" className="mt-3 max-w-3xl text-balance text-3xl font-semibold tracking-[-0.03em] text-[#0A496C] md:text-5xl">Tu recorrido durante la carrera</h2>
+              <p className="mt-5 max-w-2xl text-pretty leading-7 text-[#52606D]">Explorá las materias organizadas por año según la información académica oficial publicada por el instituto.</p>
             </div>
+            {career.planStudyUrl ? (
+              <div className="lg:col-span-4 lg:text-right">
+                <a href={career.planStudyUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#0A496C] underline decoration-[#2CBEE7] decoration-2 underline-offset-4">
+                  Descargar plan completo
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </a>
+              </div>
+            ) : null}
+          </div>
+          <div className="mt-12">
+            <StudyPlan subjects={career.subjects} />
           </div>
         </div>
       </section>
 
-      <section className="bg-white py-20">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-12 lg:px-8">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#CBD5E1] lg:col-span-5"><Image src="/instituto.jpg" alt="Instalaciones del IES Nuevo Horizonte" fill sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover" /></div>
-          <div className="lg:col-span-7 lg:pl-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Nuevo Horizonte</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C]">¿Por qué estudiar con nosotros?</h2>
-            <div className="mt-8 grid gap-6 sm:grid-cols-3">
-              <Reason icon={BriefcaseBusiness} title="Formación práctica" text="Aprendizajes orientados a situaciones profesionales reales." />
-              <Reason icon={UsersRound} title="Acompañamiento docente" text="Cercanía y seguimiento durante toda la trayectoria." />
-              <Reason icon={GraduationCap} title="Título oficial" text="Formación superior con respaldo institucional." />
-            </div>
-          </div>
-        </div>
-      </section>
+      <CareerDocuments career={career} />
 
-      {relatedCareers.length > 0 && (
-        <section className="border-t border-[#D8E1E8] bg-[#F7F9FB] py-20">
+      {relatedCareers.length > 0 ? (
+        <section className="institutional-surface-muted border-t border-[#D8E1E8] py-20">
           <div className="mx-auto max-w-7xl px-5 lg:px-8">
             <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">También te puede interesar</p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C]">Otras carreras de {career.area}</h2>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A6F94]">También te puede interesar</p>
+                <h2 className="mt-3 text-balance text-3xl font-semibold tracking-[-0.025em] text-[#0A496C]">Otras carreras de {career.area}</h2>
               </div>
-              <Link href="/carreras" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C] underline underline-offset-4">Explorar toda la oferta <ArrowLeft className="size-4 rotate-180" /></Link>
+              <Link href="/carreras" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#0A496C] underline decoration-[#2CBEE7] decoration-2 underline-offset-4">
+                Explorar toda la oferta
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
             </div>
             <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {relatedCareers.map((relatedCareer) => (
@@ -212,45 +107,10 @@ export default async function CareerDetailPage({ params }: CareerDetailPageProps
             </div>
           </div>
         </section>
-      )}
+      ) : null}
 
-      <section id="inscripcion" className="scroll-mt-28 bg-[#0A496C] px-5 py-16 text-white lg:px-8 lg:py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid items-end gap-8 border-b border-white/20 pb-10 lg:grid-cols-12">
-            <div className="lg:col-span-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8CDDF3]">Tu próximo paso</p>
-              <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-[-0.025em] md:text-5xl">Inscribite en {shortTitle}</h2>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-white/75">Completá tus datos y el equipo del instituto te contactará por WhatsApp para orientarte con la inscripción y resolver tus dudas.</p>
-            </div>
-            <div className="lg:col-span-4 lg:text-right">
-              <a href="#formulario-inscripcion" className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#2CBEE7] px-6 py-3 text-sm font-semibold text-[#073A57] transition hover:bg-white">Quiero inscribirme</a>
-            </div>
-          </div>
-
-          <div className="mt-10 grid gap-10 lg:grid-cols-12">
-            <div className="lg:col-span-4">
-              <h3 className="text-xl font-semibold">Hablemos sobre la carrera</h3>
-              <p className="mt-4 text-sm leading-6 text-white/70">La consulta quedará asociada automáticamente a {shortTitle}, para que el equipo pueda darte una respuesta específica.</p>
-            </div>
-            <div id="formulario-inscripcion" className="scroll-mt-28 rounded-2xl bg-white p-6 text-[#121C28] md:p-9 lg:col-span-8">
-              <CareerInquiryForm careerId={career.id} careerTitle={career.title} />
-            </div>
-          </div>
-        </div>
-      </section>
+      <CareerAdmissionSection career={career} shortTitle={shortTitle} />
+      <CareerMobileAdmissionBar shortTitle={shortTitle} />
     </main>
   );
-}
-
-function AcademicDatum({ icon: Icon, label, value }: { icon: typeof Clock3; label: string; value: string }) {
-  return <div className="flex items-center gap-4"><Icon className="size-5 shrink-0 text-[#0A496C]" /><div><p className="text-[11px] uppercase tracking-[0.12em] text-[#64748B]">{label}</p><p className="mt-1 font-semibold text-[#0A496C]">{value}</p></div></div>;
-}
-
-function DocumentLink({ href, label, icon: Icon }: { href?: string | null; label: string; icon: typeof Download }) {
-  if (!href) return <span aria-disabled="true" className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#AFC4D8] bg-white/50 px-4 py-3 text-sm font-semibold text-[#64748B]"><Icon className="size-4" />{label} · próximamente</span>;
-  return <a href={href} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 text-sm font-semibold text-[#0A496C] hover:ring-2 hover:ring-[#2CBEE7]"><Icon className="size-4" />{label}</a>;
-}
-
-function Reason({ icon: Icon, title, text }: { icon: typeof GraduationCap; title: string; text: string }) {
-  return <div><Icon className="size-7 text-[#2CBEE7]" /><h3 className="mt-4 font-semibold text-[#0A496C]">{title}</h3><p className="mt-2 text-sm leading-6 text-[#52606D]">{text}</p></div>;
 }

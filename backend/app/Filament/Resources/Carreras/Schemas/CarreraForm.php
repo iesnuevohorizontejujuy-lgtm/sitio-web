@@ -59,7 +59,18 @@ class CarreraForm
                         Toggle::make('publicada')->label('Visible en el sitio')->default(false),
                         Toggle::make('destacada')->label('Destacar en Inicio')->default(false),
                         TextInput::make('orden')->numeric()->minValue(0)->default(0),
-                        FileUpload::make('imagen_portada_path')->label('Imagen de portada')->disk('public')->directory('carreras/portadas')->image()->imageEditor()->maxSize(5120),
+                        FileUpload::make('imagen_portada_path')
+                            ->label('Imagen de portada de la carrera')
+                            ->helperText('Se utiliza en la tarjeta del listado y en la cabecera del detalle. Elegí una foto horizontal real de estudiantes, docentes o actividades (proporción recomendada 16:10).')
+                            ->disk('public')
+                            ->directory('carreras/portadas')
+                            ->image()
+                            ->imageEditor()
+                            ->imageCropAspectRatio('16:10')
+                            ->imageResizeTargetWidth(1600)
+                            ->imageResizeTargetHeight(1000)
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->maxSize(5120),
                         FileUpload::make('plan_estudio_path')->label('Plan de estudios (PDF)')->disk('public')->directory('carreras/planes')->acceptedFileTypes(['application/pdf'])->maxSize(10240)->downloadable()->openable(),
                         FileUpload::make('resolucion_path')->label('Resolución (PDF)')->disk('public')->directory('carreras/resoluciones')->acceptedFileTypes(['application/pdf'])->maxSize(10240)->downloadable()->openable(),
                     ]),

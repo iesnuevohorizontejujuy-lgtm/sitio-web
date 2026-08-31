@@ -2,10 +2,14 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Clock3, FileCheck2, ShieldCheck } from "lucide-react";
 import { ExamPermitForm } from "@/components/institutional/ExamPermitForm";
+import { InstitutionalPageMasthead } from "@/components/institutional/InstitutionalPageMasthead";
+import { InstitutionalPageNav } from "@/components/institutional/InstitutionalPageNav";
+import { InstitutionalSectionHeading } from "@/components/institutional/InstitutionalSectionHeading";
 
 export const metadata: Metadata = {
-  title: "Permisos de examen | IES Nuevo Horizonte",
+  title: "Permisos de examen",
   description: "Formulario público para solicitar el permiso de examen, seleccionar materias y continuar al pago del arancel.",
+  alternates: { canonical: "/permisos-examen" },
 };
 
 const assurances = [
@@ -16,29 +20,24 @@ const assurances = [
 
 export default function ExamPermitsPage() {
   return (
-    <main className="bg-[#F7FAFC]">
-      <section className="border-b border-[#D8E1E8] bg-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-[1fr_0.8fr] lg:px-8 lg:py-20">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0A496C]">Trámite académico</p>
-            <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.04em] text-[#123A50] sm:text-5xl">Permiso de examen</h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-[#52606D]">
-              Completá tus datos, elegí las materias que vas a rendir y continuá al pago del derecho de examen.
-            </p>
-          </div>
-          <aside className="border-l-4 border-[#2CBEE7] bg-[#E0ECF8]/55 p-6">
-            <p className="font-semibold text-[#123A50]">Antes de comenzar</p>
-            <p className="mt-3 text-sm leading-6 text-[#52606D]">
-              Tené a mano tu DNI y verificá las fechas y llamados publicados por el instituto. Podés incluir hasta ocho materias en una misma solicitud.
-            </p>
-          </aside>
-        </div>
-      </section>
+    <main className="institutional-shell">
+      <InstitutionalPageMasthead
+        eyebrow="Trámite académico"
+        title="Permiso de examen"
+        description="Completá tus datos, elegí las materias que vas a rendir y continuá al pago del derecho de examen."
+      >
+        <aside className="border-l-4 border-[#2CBEE7] bg-white p-5">
+          <p className="font-semibold text-[#0A496C]">Antes de comenzar</p>
+          <p className="mt-2 text-sm leading-6 text-[#52606D]">Tené a mano tu DNI y verificá las fechas y llamados publicados por el instituto. Podés incluir hasta ocho materias en una misma solicitud.</p>
+        </aside>
+      </InstitutionalPageMasthead>
 
-      <section className="border-b border-[#D8E1E8] bg-white">
+      <InstitutionalPageNav items={[{ href: "#como-funciona", label: "Cómo funciona" }, { href: "#solicitud", label: "Completar solicitud" }]} />
+
+      <section id="como-funciona" className="institutional-surface-brand border-b border-[#C6D7E5]">
         <div className="mx-auto grid max-w-7xl gap-px bg-[#D8E1E8] md:grid-cols-3">
           {assurances.map(({ icon: Icon, title, text }) => (
-            <div key={title} className="flex gap-4 bg-white px-6 py-7 lg:px-8">
+            <div key={title} className="flex gap-4 bg-[#F7FAFC] px-6 py-7 lg:px-8">
               <Icon className="mt-0.5 size-5 shrink-0 text-[#0A496C]" />
               <div><p className="font-semibold text-[#123A50]">{title}</p><p className="mt-1 text-sm leading-6 text-[#64748B]">{text}</p></div>
             </div>
@@ -46,9 +45,16 @@ export default function ExamPermitsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-5 py-12 lg:px-8 lg:py-16">
-        <Suspense fallback={<div className="rounded-2xl border border-[#D8E1E8] bg-white p-12 text-center text-[#64748B]">Preparando el formulario…</div>}>
+      <section id="solicitud" className="mx-auto max-w-5xl px-5 py-12 lg:px-8 lg:py-16">
+        <InstitutionalSectionHeading
+          eyebrow="Solicitud en línea"
+          title="Completá el permiso paso a paso"
+          description="Los datos de la convocatoria y la oferta de materias se consultan directamente en los sistemas institucionales."
+        />
+        <Suspense fallback={<div className="mt-10 rounded-2xl border border-[#D8E1E8] bg-white p-12 text-center text-[#64748B]">Preparando el formulario…</div>}>
+          <div className="mt-10">
           <ExamPermitForm />
+          </div>
         </Suspense>
       </section>
     </main>

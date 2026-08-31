@@ -28,6 +28,8 @@ class NoticiasTable
                     default => 'Noticia general',
                 }),
                 TextColumn::make('fecha_evento')->label('Fecha actividad')->date('d/m/Y')->sortable(),
+                IconColumn::make('destacada')->label('Destacada')->boolean(),
+                TextColumn::make('orden_destacado')->label('Prioridad')->numeric()->sortable()->placeholder('—'),
                 IconColumn::make('esta_publicada')->label('Publicada')->boolean(),
                 TextColumn::make('publicada_at')->label('Publicación')->dateTime('d/m/Y H:i')->sortable(),
             ])

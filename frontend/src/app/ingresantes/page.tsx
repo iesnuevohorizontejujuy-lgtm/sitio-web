@@ -1,28 +1,29 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
   BadgeCheck,
-  BookOpenCheck,
   CalendarDays,
   CheckCircle2,
   ClipboardCheck,
   Download,
   FileCheck2,
-  GraduationCap,
   HelpCircle,
   MessageCircleQuestion,
   Search,
 } from "lucide-react";
 import { CareerInquiryForm } from "@/components/institutional/CareerInquiryForm";
+import { InstitutionalPageMasthead } from "@/components/institutional/InstitutionalPageMasthead";
+import { InstitutionalPageNav } from "@/components/institutional/InstitutionalPageNav";
+import { InstitutionalSectionHeading } from "@/components/institutional/InstitutionalSectionHeading";
 import { MotionReveal } from "@/components/institutional/MotionReveal";
 import { formatAdmissionDate, getAdmissionCall } from "@/lib/admissions";
 import { getCareers } from "@/lib/careers";
 
 export const metadata: Metadata = {
-  title: "Ingresantes | IES Nuevo Horizonte",
+  title: "Ingresantes",
   description: "Orientación para elegir una carrera, consultar disponibilidad y conocer el proceso de inscripción al IES Nuevo Horizonte.",
+  alternates: { canonical: "/ingresantes" },
 };
 
 const steps = [
@@ -88,38 +89,34 @@ export default async function AdmissionsPage() {
     : null;
 
   return (
-    <main className="institutional-shell bg-white text-[#121C28]">
-      <section className="border-b border-[#D8E1E8]">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-12 lg:px-8 lg:py-24">
-          <MotionReveal className="lg:col-span-5">
-            <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#0A496C]"><span className="h-0.5 w-9 bg-[#2CBEE7]" />Ingreso y orientación</p>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.08] tracking-[-0.035em] text-[#0A496C] sm:text-5xl lg:text-6xl">Tu camino empieza con una buena elección</h1>
-            <p className="mt-7 text-lg leading-8 text-[#52606D]">Conocé la oferta académica y recibí acompañamiento para consultar requisitos, disponibilidad y próximos pasos.</p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link href="/carreras" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#2CBEE7] px-6 py-3 text-sm font-semibold text-[#073A57] transition hover:bg-[#51D5FF]">Explorar carreras <ArrowRight className="size-4" /></Link>
-              <a href="#orientacion" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-[#0A496C] px-6 py-3 text-sm font-semibold text-[#0A496C] hover:bg-[#E0ECF8]">Quiero orientación</a>
-            </div>
-            <div className="mt-9 grid grid-cols-3 gap-4 border-t border-[#D8E1E8] pt-6">
-              <div><p className="text-xl font-semibold text-[#0A496C]">{careers.length}</p><p className="mt-1 text-xs text-[#64748B]">Carreras publicadas</p></div>
-              <div><GraduationCap className="size-6 text-[#0A496C]" /><p className="mt-2 text-xs text-[#64748B]">Títulos oficiales</p></div>
-              <div><BookOpenCheck className="size-6 text-[#0A496C]" /><p className="mt-2 text-xs text-[#64748B]">Planes de estudio</p></div>
-            </div>
-          </MotionReveal>
-
-          <MotionReveal className="relative lg:col-span-7" delay={0.1}>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#B7CADB] bg-[#E0ECF8]">
-              <Image src="/instituto.jpg" alt="Instalaciones del IES Nuevo Horizonte" fill priority sizes="(max-width: 1024px) 100vw, 58vw" className="object-cover" />
-            </div>
-            <div className="absolute bottom-5 left-5 max-w-[270px] border-l-4 border-[#2CBEE7] bg-white p-5 shadow-[0_4px_20px_rgba(10,73,108,0.12)] sm:bottom-7 sm:left-7">
-              <p className="font-semibold text-[#0A496C]">No estás solo para elegir</p>
-              <p className="mt-1 text-sm leading-5 text-[#52606D]">Nuestro equipo puede orientarte antes de comenzar el proceso.</p>
-            </div>
-          </MotionReveal>
+    <main className="institutional-shell text-[#121C28]">
+      <InstitutionalPageMasthead
+        eyebrow="Ingreso y orientación"
+        title="Tu camino empieza con una buena elección"
+        description="Conocé la oferta académica y recibí acompañamiento para consultar requisitos, disponibilidad y próximos pasos."
+        image="/instituto.jpg"
+        imageAlt="Instalaciones del IES Nuevo Horizonte"
+        caption={{ eyebrow: "Acompañamiento", title: "Nuestro equipo puede orientarte antes de comenzar el proceso" }}
+        priority
+      >
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Link href="/carreras" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#0A496C] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#073A57]">Explorar {careers.length} carreras <ArrowRight className="size-4" aria-hidden="true" /></Link>
+          <a href="#orientacion" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-[#0A496C] px-6 py-3 text-sm font-semibold text-[#0A496C] hover:bg-[#E0ECF8]">Quiero orientación</a>
         </div>
-      </section>
+      </InstitutionalPageMasthead>
+
+      <InstitutionalPageNav
+        items={[
+          ...(admissionCall ? [{ href: "#convocatoria" as const, label: "Convocatoria" }] : []),
+          { href: "#proceso" as const, label: "Cómo ingresar" },
+          { href: "#areas" as const, label: "Áreas de formación" },
+          { href: "#preguntas" as const, label: "Preguntas frecuentes" },
+          { href: "#orientacion" as const, label: "Orientación" },
+        ]}
+      />
 
       {admissionCall && (
-        <section className="border-b border-[#D8E1E8] bg-white py-16 md:py-20">
+        <section id="convocatoria" className="institutional-surface-muted border-b border-[#D8E1E8] py-16 md:py-20">
           <div className="mx-auto max-w-7xl px-5 lg:px-8">
             <MotionReveal className="grid overflow-hidden rounded-2xl border border-[#B7CADB] lg:grid-cols-12">
               <div className="bg-[#0A496C] p-7 text-white md:p-10 lg:col-span-5">
@@ -172,12 +169,14 @@ export default async function AdmissionsPage() {
         </section>
       )}
 
-      <section className="border-b border-[#D8E1E8] bg-[#F7F9FB] py-20 md:py-24">
+      <section id="proceso" className="institutional-surface-brand border-b border-[#C6D7E5] py-20 md:py-24">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <MotionReveal className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]">Paso a paso</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Cómo iniciar tu ingreso</h2>
-            <p className="mt-5 text-lg leading-8 text-[#52606D]">Un recorrido sencillo para informarte primero y completar el trámite con datos actualizados.</p>
+            <InstitutionalSectionHeading
+              eyebrow="Paso a paso"
+              title="Cómo iniciar tu ingreso"
+              description="Un recorrido sencillo para informarte primero y completar el trámite con datos actualizados."
+            />
           </MotionReveal>
           <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-[#CBD5E1] bg-[#CBD5E1] md:grid-cols-2 xl:grid-cols-4">
             {steps.map(({ icon: Icon, title, text }, index) => (
@@ -194,12 +193,15 @@ export default async function AdmissionsPage() {
         </div>
       </section>
 
-      <section className="py-20 md:py-24">
+      <section id="areas" className="institutional-surface-canvas py-20 md:py-24">
         <div className="mx-auto grid max-w-7xl items-start gap-12 px-5 lg:grid-cols-12 lg:px-8">
           <MotionReveal className="lg:col-span-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]">Oferta académica</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Encontrá un área que conecte con vos</h2>
-            <p className="mt-5 leading-7 text-[#52606D]">La oferta publicada se organiza en áreas para que puedas explorarla según tus intereses.</p>
+            <InstitutionalSectionHeading
+              eyebrow="Oferta académica"
+              title="Encontrá un área que conecte con vos"
+              description="La oferta publicada se organiza en áreas para que puedas explorarla según tus intereses."
+              className="md:flex-col md:items-start"
+            />
             <Link href="/carreras" className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C] underline underline-offset-4">Ver todas las carreras <ArrowRight className="size-4" /></Link>
           </MotionReveal>
           <div className="grid gap-px overflow-hidden rounded-2xl border border-[#CBD5E1] bg-[#CBD5E1] sm:grid-cols-2 lg:col-span-7">
@@ -212,13 +214,17 @@ export default async function AdmissionsPage() {
         </div>
       </section>
 
-      <section className="bg-[#0A496C] py-20 text-white md:py-24">
+      <section id="preguntas" className="bg-[#0A496C] py-20 text-white md:py-24">
         <div className="mx-auto grid max-w-7xl gap-12 px-5 lg:grid-cols-12 lg:px-8">
           <MotionReveal className="lg:col-span-5">
             <HelpCircle className="size-9 text-[#2CBEE7]" />
-            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#2CBEE7]">Preguntas frecuentes</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] md:text-4xl">Antes de iniciar</h2>
-            <p className="mt-5 leading-7 text-white/75">La información definitiva siempre será la comunicada por el instituto para el período correspondiente.</p>
+            <InstitutionalSectionHeading
+              eyebrow="Preguntas frecuentes"
+              title="Antes de iniciar"
+              description="La información definitiva siempre será la comunicada por el instituto para el período correspondiente."
+              inverse
+              className="mt-6 md:flex-col md:items-start"
+            />
           </MotionReveal>
           <MotionReveal className="divide-y divide-white/15 border-y border-white/15 lg:col-span-7" delay={0.08}>
             {faqs.map((faq) => (
@@ -231,12 +237,15 @@ export default async function AdmissionsPage() {
         </div>
       </section>
 
-      <section id="orientacion" className="scroll-mt-28 bg-[#E0ECF8] px-5 py-20 lg:px-8 lg:py-24">
+      <section id="orientacion" className="bg-[#E0ECF8] px-5 py-20 lg:px-8 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-12">
           <MotionReveal className="lg:col-span-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]">Orientación</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Contanos qué necesitás saber</h2>
-            <p className="mt-5 leading-7 text-[#52606D]">La consulta llegará al panel institucional para que el equipo pueda responderte por WhatsApp o correo.</p>
+            <InstitutionalSectionHeading
+              eyebrow="Orientación"
+              title="Contanos qué necesitás saber"
+              description="La consulta llegará al panel institucional para que el equipo pueda responderte por WhatsApp o correo."
+              className="md:flex-col md:items-start"
+            />
             <div className="mt-7 flex gap-3 text-sm leading-6 text-[#52606D]"><CheckCircle2 className="mt-1 size-4 shrink-0 text-[#0A496C]" /><span>Este formulario solicita orientación; no confirma una inscripción.</span></div>
           </MotionReveal>
           <MotionReveal className="rounded-2xl bg-white p-6 md:p-9 lg:col-span-8" delay={0.08}>

@@ -5,8 +5,12 @@ use App\Models\CarreraImagen;
 use App\Models\CarreraPublicacionSocial;
 use App\Models\Materia;
 
-it('publishes only visible careers with their study plan and gallery', function () {
-    $published = Carrera::factory()->create(['nombre' => 'Desarrollo de Software', 'slug' => 'desarrollo-de-software']);
+it('publishes only visible careers with their cover, study plan and gallery', function () {
+    $published = Carrera::factory()->create([
+        'nombre' => 'Desarrollo de Software',
+        'slug' => 'desarrollo-de-software',
+        'imagen_portada_path' => 'carreras/portadas/desarrollo-software.webp',
+    ]);
     Carrera::factory()->draft()->create(['slug' => 'carrera-borrador']);
     Materia::factory()->for($published)->create(['nombre' => 'Programación I', 'anio' => 1]);
     CarreraImagen::factory()->for($published)->create(['texto_alternativo' => 'Estudiantes en el aula']);
@@ -16,6 +20,8 @@ it('publishes only visible careers with their study plan and gallery', function 
         ->assertSuccessful()
         ->assertJsonCount(1)
         ->assertJsonPath('0.slug', 'desarrollo-de-software')
+        ->assertJsonPath('0.image', url('/storage/carreras/portadas/desarrollo-software.webp'))
+        ->assertJsonPath('0.image_thumb', url('/storage/carreras/portadas/desarrollo-software.webp'))
         ->assertJsonPath('0.subjects.0.name', 'Programación I')
         ->assertJsonCount(8, '0.gallery')
         ->assertJsonPath('0.gallery.0.alt', 'Estudiantes en el aula')

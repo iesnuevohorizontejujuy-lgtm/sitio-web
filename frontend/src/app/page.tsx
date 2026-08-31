@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -5,71 +6,145 @@ import {
   BookOpenCheck,
   Building2,
   CalendarDays,
+  ClipboardCheck,
+  FileText,
   GraduationCap,
+  Newspaper,
   UsersRound,
 } from "lucide-react";
-import { CareerCarousel } from "@/components/institutional/CareerCarousel";
-import { HeroMediaCarousel } from "@/components/institutional/HeroMediaCarousel";
+import { HeroMediaCarousel, type HomeHeroSlide } from "@/components/institutional/HeroMediaCarousel";
+import { HomeAcademicExperience, type HomeExperienceItem } from "@/components/institutional/HomeAcademicExperience";
+import { HomeCareerDiscovery } from "@/components/institutional/HomeCareerDiscovery";
 import { HomeNewsEditorial } from "@/components/institutional/HomeNewsEditorial";
-import { MotionReveal } from "@/components/institutional/MotionReveal";
 import { formatAdmissionDate, getAdmissionCall } from "@/lib/admissions";
 import { getCareers } from "@/lib/careers";
-import { getInstitutionalNews } from "@/lib/institutional-news";
+import { getHomepageSlides } from "@/lib/homepage-slides";
+import { getInstitutionalNews, stripInstitutionalHtml } from "@/lib/institutional-news";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
+const quickAccesses = [
+  { label: "Carreras", description: "20 tecnicaturas superiores", href: "/carreras", icon: GraduationCap },
+  { label: "Ingresantes", description: "Requisitos e inscripción", href: "/ingresantes", icon: UsersRound },
+  { label: "Estudiantes", description: "Permisos de examen", href: "/permisos-examen", icon: ClipboardCheck },
+  { label: "Institución", description: "Conocé el Nuevo Horizonte", href: "/institucion", icon: Building2 },
+  { label: "Comunidad", description: "Noticias y actividades", href: "/vida-institucional", icon: Newspaper },
+  { label: "NHDocs", description: "Documentación institucional", href: "/nhdocs", icon: FileText },
+] as const;
+
+const institutionalHighlights = [
+  { icon: GraduationCap, title: "Títulos oficiales", text: "Carreras superiores con respaldo normativo." },
+  { icon: Building2, title: "Modalidad presencial", text: "Encuentro, práctica e intercambio en el aula." },
+  { icon: BookOpenCheck, title: "Prácticas profesionalizantes", text: "Experiencias integradas a cada plan de estudios." },
+  { icon: UsersRound, title: "Acompañamiento cercano", text: "Docentes comprometidos con cada trayectoria." },
+] as const;
 
 export default async function HomePage() {
-  const [careers, institutionalNews, admissionCall] = await Promise.all([
+  const [careers, institutionalNews, admissionCall, managedHomepageSlides] = await Promise.all([
     getCareers(),
     getInstitutionalNews(),
     getAdmissionCall(),
+    getHomepageSlides(),
   ]);
-  const featuredSlugs = [
-    "desarrollo-de-software",
-    "enfermeria",
-    "administracion-financiera",
-    "actividad-fisica-y-fitness",
+  const latestInstitutionalNews = institutionalNews.noticias.slice(0, 4);
+  const featuredNews = institutionalNews.destacadas.find((item) => item.imagen_principal)
+    ?? latestInstitutionalNews.find((item) => item.imagen_principal);
+  const fallbackHeroSlides: HomeHeroSlide[] = [
+    {
+      id: "futuro-profesional",
+      eyebrow: "Educación superior en Jujuy",
+      title: "Tu futuro profesional comienza acá",
+      description: "Formación superior cercana, práctica y comprometida con las oportunidades profesionales de nuestra provincia.",
+      image: "/herosection.webp",
+      imageAlt: "Estudiantes proyectando su futuro profesional",
+      primaryLabel: "Conocé nuestras carreras",
+      primaryHref: "/carreras",
+      secondaryLabel: "Cómo inscribirme",
+      secondaryHref: "/ingresantes",
+    },
+    admissionCall ? {
+      id: "ingreso",
+      eyebrow: admissionCall.estado === "abiertas" ? "Inscripciones abiertas" : admissionCall.estado === "cerradas" ? "Información de ingreso" : "Próximo ingreso",
+      title: admissionCall.titulo,
+      description: admissionCall.bajada ?? "Encontrá los requisitos, la documentación y las fechas para comenzar tu carrera en el instituto.",
+      image: "/instituto.jpg",
+      imageAlt: "Aula de informática del IES Nuevo Horizonte",
+      primaryLabel: "Ver información de ingreso",
+      primaryHref: "/ingresantes",
+      secondaryLabel: "Consultar carreras",
+      secondaryHref: "/carreras",
+    } : {
+      id: "oferta-academica",
+      eyebrow: "20 carreras",
+      title: "Encontrá una carrera para transformar tu vocación",
+      description: "Conocé la duración, el perfil profesional y el plan de estudios de cada tecnicatura.",
+      image: "/institutional/software-students.png",
+      imageAlt: "Estudiantes trabajando en equipo durante una actividad académica",
+      primaryLabel: "Explorar la oferta académica",
+      primaryHref: "/carreras",
+    },
+    featuredNews ? {
+      id: `noticia-${featuredNews.id}`,
+      eyebrow: "Vida institucional",
+      title: featuredNews.titulo,
+      description: stripInstitutionalHtml(featuredNews.contenido).slice(0, 180) || "Conocé las actividades y novedades de nuestra comunidad educativa.",
+      image: featuredNews.imagen_principal!,
+      imageAlt: featuredNews.titulo,
+      primaryLabel: "Leer la noticia",
+      primaryHref: `/vida-institucional/${featuredNews.slug}`,
+      secondaryLabel: "Ver todas las novedades",
+      secondaryHref: "/vida-institucional",
+    } : {
+      id: "comunidad",
+      eyebrow: "Comunidad educativa",
+      title: "Aprender también es participar, crear y compartir",
+      description: "Prácticas, jornadas y actividades que conectan la formación con la vida profesional.",
+      image: "/instituto.jpg",
+      imageAlt: "Espacios de formación del IES Nuevo Horizonte",
+      primaryLabel: "Conocé la vida institucional",
+      primaryHref: "/vida-institucional",
+    },
   ];
-  const featuredCareers = featuredSlugs
-    .map((slug) => careers.find((career) => career.slug === slug))
-    .filter((career) => career !== undefined);
-  const latestInstitutionalNews = [
-    ...institutionalNews.generales,
-    ...institutionalNews.fechas_importantes,
-  ]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 4);
+  const heroSlides: HomeHeroSlide[] = managedHomepageSlides.length > 0
+    ? managedHomepageSlides.map((slide) => ({
+        id: `cms-${slide.id}`,
+        eyebrow: slide.etiqueta,
+        title: slide.titulo,
+        description: slide.bajada,
+        image: slide.imagen_escritorio,
+        mobileImage: slide.imagen_movil ?? undefined,
+        imageAlt: slide.imagen_alt,
+        primaryLabel: slide.texto_boton,
+        primaryHref: slide.url_boton,
+        secondaryLabel: slide.texto_boton_secundario ?? undefined,
+        secondaryHref: slide.url_boton_secundario ?? undefined,
+      }))
+    : fallbackHeroSlides;
+  const socialExperience: HomeExperienceItem[] = careers.flatMap((career) =>
+    career.socialPosts
+      .filter((post) => !/(testimonio|egresad[oa]s?)/i.test(`${post.title} ${post.description ?? ""}`))
+      .map((post) => ({
+      id: `social-${career.slug}-${post.id}`,
+      career: career.shortTitle ?? career.title.replace(/^Tecnicatura Superior en\s+/i, ""),
+      title: post.title,
+      description: post.description,
+      image: post.previewImage,
+      imageAlt: post.previewAlt,
+      href: post.url,
+      external: true,
+      kind: "social" as const,
+      })),
+  );
+  const experienceItems = [
+    ...socialExperience.filter((item) => item.image),
+    ...socialExperience.filter((item) => !item.image),
+  ].slice(0, 3);
 
   return (
-    <main className="institutional-shell bg-white text-[#121C28]">
-      <section className="border-b border-[#D8E1E8]">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 md:py-20 lg:grid-cols-12 lg:px-8 lg:py-24">
-          <MotionReveal className="lg:col-span-5">
-            <div className="mb-6 h-0.5 w-10 bg-[#2CBEE7]" />
-            <h1 className="max-w-xl text-4xl font-bold leading-[1.08] tracking-[-0.035em] text-[#0A496C] sm:text-5xl lg:text-6xl">
-              Tu futuro profesional comienza acá
-            </h1>
-            <p className="mt-7 max-w-xl text-base leading-7 text-[#52606D] md:text-lg">
-              Formación superior cercana, práctica y comprometida con las oportunidades profesionales de Jujuy.
-            </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link href="/carreras" className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#2CBEE7] px-6 py-3 text-sm font-semibold text-[#073A57] transition hover:bg-[#51D5FF]">
-                Conocé nuestras carreras
-              </Link>
-              <Link href="/ingresantes" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-[#0A496C] px-6 py-3 text-sm font-semibold text-[#0A496C] transition hover:bg-[#E0ECF8]">
-                Cómo inscribirme
-              </Link>
-            </div>
-            <div className="mt-9 grid grid-cols-3 gap-4 border-t border-[#D8E1E8] pt-6">
-              <div><p className="text-xl font-semibold text-[#0A496C]">{careers.length}</p><p className="mt-1 text-xs leading-5 text-[#64748B]">Carreras</p></div>
-              <div><p className="text-sm font-semibold text-[#0A496C]">Oficiales</p><p className="mt-1 text-xs leading-5 text-[#64748B]">Títulos</p></div>
-              <div><p className="text-sm font-semibold text-[#0A496C]">Presencial</p><p className="mt-1 text-xs leading-5 text-[#64748B]">Modalidad</p></div>
-            </div>
-          </MotionReveal>
-
-          <MotionReveal className="relative lg:col-span-7" delay={0.12}>
-            <HeroMediaCarousel />
-          </MotionReveal>
-        </div>
-      </section>
+    <main className="institutional-shell text-[#121C28]">
+      <HeroMediaCarousel slides={heroSlides} />
 
       {admissionCall && (
         <section className="border-b border-[#D8E1E8] bg-[#0A496C] text-white">
@@ -77,7 +152,7 @@ export default async function HomePage() {
             <div className="flex items-start gap-4">
               <CalendarDays className="mt-1 size-6 shrink-0 text-[#2CBEE7]" />
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2CBEE7]">{admissionCall.estado === "abiertas" ? "Inscripciones abiertas" : admissionCall.estado === "cerradas" ? "Inscripciones cerradas" : "Próximo ingreso"}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#8CDDF3]">{admissionCall.estado === "abiertas" ? "Inscripciones abiertas" : admissionCall.estado === "cerradas" ? "Inscripciones cerradas" : "Próximo ingreso"}</p>
                 <h2 className="mt-1 text-xl font-semibold">{admissionCall.titulo}</h2>
                 {(admissionCall.fecha_inicio || admissionCall.fecha_fin) && <p className="mt-1 text-sm text-white/70">{admissionCall.fecha_inicio && formatAdmissionDate(admissionCall.fecha_inicio)}{admissionCall.fecha_inicio && admissionCall.fecha_fin && " — "}{admissionCall.fecha_fin && formatAdmissionDate(admissionCall.fecha_fin)}</p>}
               </div>
@@ -87,60 +162,74 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section className="border-b border-[#D8E1E8] py-16">
-        <div className="mx-auto grid max-w-7xl gap-5 px-5 md:grid-cols-2 lg:px-8">
-          <Link href="/carreras" className="group border border-[#CBD5E1] bg-white p-8 transition-colors hover:border-[#0A496C] md:p-10">
-            <div className="flex items-start justify-between">
-              <GraduationCap className="size-10 text-[#0A496C]" />
-              <ArrowRight className="size-5 text-[#64748B] transition-transform group-hover:translate-x-1" />
-            </div>
-            <h2 className="mt-8 text-2xl font-semibold text-[#0A496C]">Quiero estudiar</h2>
-            <p className="mt-3 max-w-lg leading-6 text-[#52606D]">Descubrí la oferta académica, modalidades y documentación de cada carrera.</p>
-          </Link>
-          <Link href="/campus" className="group bg-[#0A496C] p-8 text-white transition-colors hover:bg-[#073A57] md:p-10">
-            <div className="flex items-start justify-between">
-              <UsersRound className="size-10 text-[#2CBEE7]" />
-              <ArrowRight className="size-5 text-white/70 transition-transform group-hover:translate-x-1" />
-            </div>
-            <h2 className="mt-8 text-2xl font-semibold">Soy parte de la comunidad</h2>
-            <p className="mt-3 max-w-lg leading-6 text-white/70">Accedé al Campus Virtual y a las herramientas para estudiantes y docentes.</p>
-          </Link>
-        </div>
-      </section>
-
-      <section className="py-20 md:py-24">
+      <section aria-labelledby="quick-access-title" className="border-b border-[#D8E1E8] bg-white py-12 md:py-16">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <div className="mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+          <div className="flex flex-col justify-between gap-4 border-b border-[#C6D7E5] pb-5 sm:flex-row sm:items-end">
             <div>
-              <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]"><span className="h-0.5 w-8 bg-[#2CBEE7]" />Nuestra oferta académica</p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Elegí tu camino profesional</h2>
+              <p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#0A6F94]">Accesos principales</p>
+              <h2 id="quick-access-title" className="mt-3 text-2xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-3xl">Encontrá la información que necesitás</h2>
             </div>
-            <Link href="/carreras" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C] underline underline-offset-4">Ver las 20 carreras <ArrowRight className="size-4" /></Link>
+            <p className="max-w-md text-sm leading-6 text-[#52606D]">Accesos directos para estudiantes, ingresantes y toda la comunidad educativa.</p>
           </div>
-          <CareerCarousel careers={featuredCareers} />
-        </div>
-      </section>
-
-      <section id="institucion" className="scroll-mt-28 bg-[#0A496C] py-20 text-white md:py-24">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-2 lg:gap-20 lg:px-8">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/15">
-            <Image src="/instituto.jpg" alt="Instalaciones del IES Nuevo Horizonte" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
-          </div>
-          <div>
-            <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#2CBEE7]"><span className="h-0.5 w-10 bg-[#2CBEE7]" />Nuestra institución</p>
-            <h2 className="mt-5 text-3xl font-semibold leading-tight tracking-[-0.025em] md:text-5xl">Educación cercana, oportunidades reales</h2>
-            <p className="mt-7 text-lg leading-8 text-white/75">Acompañamos cada trayectoria con formación técnica, práctica profesional y docentes comprometidos con el desarrollo de sus estudiantes.</p>
-            <div className="mt-10 grid gap-6 border-t border-white/15 pt-8 sm:grid-cols-3">
-              <div><BookOpenCheck className="size-7 text-[#2CBEE7]" /><p className="mt-3 font-semibold">Formación práctica</p></div>
-              <div><UsersRound className="size-7 text-[#2CBEE7]" /><p className="mt-3 font-semibold">Acompañamiento</p></div>
-              <div><Building2 className="size-7 text-[#2CBEE7]" /><p className="mt-3 font-semibold">Entorno profesional</p></div>
-            </div>
-            <Link href="/institucion" className="mt-9 inline-flex items-center gap-2 text-sm font-semibold text-[#2CBEE7]">Conocé nuestra institución <ArrowRight className="size-4" /></Link>
+          <div className="mt-7 grid gap-px overflow-hidden rounded-xl border border-[#C6D7E5] bg-[#C6D7E5] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {quickAccesses.map((access) => {
+            const Icon = access.icon;
+            return (
+              <Link key={access.href} href={access.href} className="group flex min-h-44 flex-col items-center justify-center bg-[#F4F7F9] px-4 py-6 text-center transition-colors hover:bg-[#E0ECF8] focus-visible:z-10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-[#2CBEE7]/40">
+                <span className="inline-flex size-16 items-center justify-center rounded-full bg-white text-[#0A496C] shadow-[0_4px_14px_rgba(10,73,108,0.08)] transition-transform group-hover:-translate-y-1"><Icon className="size-7" aria-hidden="true" /></span>
+                <span className="mt-4 block font-semibold text-[#0A496C]">{access.label}</span>
+                <span className="mt-1 block text-xs leading-5 text-[#52606D]">{access.description}</span>
+              </Link>
+            );
+          })}
           </div>
         </div>
       </section>
 
-      <section id="vida-institucional" className="scroll-mt-28 py-20 md:py-24">
+      <HomeCareerDiscovery careers={careers.map((career) => ({
+        title: career.title,
+        slug: career.slug,
+        area: career.area,
+        duration: career.duration,
+        modality: career.modality,
+      }))} />
+
+      <HomeAcademicExperience items={experienceItems} />
+
+      <section id="institucion" className="scroll-mt-28 border-b border-[#D8E1E8] bg-white py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <div className="grid gap-5 border-b border-[#C6D7E5] pb-6 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-7">
+              <p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#0A6F94]">Nuestra institución</p>
+              <h2 className="mt-3 text-balance text-3xl font-semibold tracking-[-0.035em] text-[#0A496C] md:text-5xl">Formación técnica con sentido práctico</h2>
+            </div>
+            <p className="max-w-xl leading-7 text-[#52606D] lg:col-span-5 lg:justify-self-end">Una propuesta educativa cercana, comprometida con las trayectorias estudiantiles y las oportunidades profesionales de Jujuy.</p>
+          </div>
+
+          <div className="group relative mt-8 min-h-[430px] overflow-hidden rounded-xl bg-[#0A496C] sm:min-h-[520px]">
+            <Image src="/instituto.jpg" alt="Instalaciones del IES Nuevo Horizonte" fill sizes="(max-width: 1280px) 100vw, 1280px" className="object-cover transition-transform duration-700 group-hover:scale-[1.015]" />
+            <div className="absolute inset-0 bg-[#073A57]/58" aria-hidden="true" />
+            <div className="absolute inset-x-0 bottom-0 p-7 text-white sm:p-10 lg:max-w-3xl lg:p-12">
+              <p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#8CDDF3]">San Salvador de Jujuy</p>
+              <h3 className="mt-4 text-balance text-3xl font-semibold leading-tight tracking-[-0.03em] sm:text-4xl">Una institución cercana a su comunidad</h3>
+              <p className="mt-4 max-w-2xl leading-7 text-white/80">Conocimientos específicos, prácticas profesionalizantes y acompañamiento docente para construir herramientas aplicables al ejercicio profesional.</p>
+              <Link href="/institucion" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-white underline decoration-[#2CBEE7] decoration-2 underline-offset-4">Conocé nuestra propuesta institucional <ArrowRight className="size-4" aria-hidden="true" /></Link>
+            </div>
+          </div>
+
+          <div className="grid gap-px overflow-hidden rounded-b-xl border-x border-b border-[#C6D7E5] bg-[#C6D7E5] sm:grid-cols-2 lg:grid-cols-4">
+            {institutionalHighlights.map(({ icon: Icon, title, text }) => (
+              <div key={title} className="bg-[#F4F7F9] p-6 lg:p-7">
+                <Icon className="size-7 text-[#0A6F94]" aria-hidden="true" />
+                <h3 className="mt-4 font-semibold text-[#0A496C]">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-[#52606D]">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="vida-institucional" className="institutional-surface-muted scroll-mt-28 border-b border-[#D8E1E8] py-20 md:py-24">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]"><span className="h-0.5 w-8 bg-[#0A496C]" />Comunidad</p>
           <div className="mt-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -150,8 +239,8 @@ export default async function HomePage() {
             </div>
             <Link href="/vida-institucional" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C]">Ver todas las novedades <ArrowRight className="size-4" /></Link>
           </div>
-          {latestInstitutionalNews.length > 0 ? (
-            <HomeNewsEditorial items={latestInstitutionalNews} />
+          {latestInstitutionalNews.length > 0 || institutionalNews.agenda.length > 0 ? (
+            <HomeNewsEditorial featuredItems={institutionalNews.destacadas} newsItems={latestInstitutionalNews} agendaItems={institutionalNews.agenda} />
           ) : (
             <Link href="/vida-institucional" className="mt-10 flex items-center justify-between gap-6 border-l-4 border-[#2CBEE7] bg-[#F7F9FB] p-7 text-[#52606D]">
               <span>Las próximas noticias y actividades cargadas desde el panel institucional aparecerán acá.</span>
@@ -161,7 +250,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section id="inscripcion" className="px-5 pb-20 md:pb-24 lg:px-8">
+      <section id="inscripcion" className="institutional-surface-canvas px-5 py-20 md:py-24 lg:px-8">
         <div className="mx-auto max-w-7xl rounded-2xl bg-[#0A496C] px-6 py-14 text-center text-white sm:px-12 md:py-16">
           <h2 className="text-3xl font-semibold tracking-[-0.025em] md:text-4xl">¿Listo para dar el próximo paso?</h2>
           <p className="mx-auto mt-4 max-w-2xl leading-7 text-white/75">Consultá la disponibilidad del próximo ciclo lectivo y recibí acompañamiento durante tu inscripción.</p>

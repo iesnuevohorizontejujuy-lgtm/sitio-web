@@ -15,7 +15,7 @@ class Consulta extends Model
 
     protected $fillable = [
         'carrera_id', 'nombre', 'telefono', 'email', 'asunto', 'mensaje',
-        'horario_preferido', 'pagina_origen', 'estado', 'notas_internas', 'respondida_at',
+        'pagina_origen', 'estado', 'notas_internas', 'respondida_at',
     ];
 
     protected $attributes = ['estado' => 'nueva'];

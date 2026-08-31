@@ -25,6 +25,10 @@ class NoticiaResource extends JsonResource
             'created_at' => $this->created_at,
             'publicada_at' => $this->publicada_at,
             'fecha_evento' => $this->fecha_evento?->toDateString(),
+            'fecha_fin_evento' => $this->fecha_fin_evento?->toDateString(),
+            'lugar_evento' => $this->lugar_evento,
+            'destacada' => $this->destacada,
+            'orden_destacado' => $this->orden_destacado,
             'video_url' => $this->video_url,
             'imagen_principal' => $this->imagen_principal_path
                 ? url(Storage::disk('public')->url($this->imagen_principal_path))

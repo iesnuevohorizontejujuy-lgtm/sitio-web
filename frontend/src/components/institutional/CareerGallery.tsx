@@ -39,7 +39,7 @@ export function CareerGallery({ images }: { images: CareerGalleryImage[] }) {
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-0"
           >
-            <Image src={activeImage.url} alt={activeImage.alt} fill unoptimized sizes="(max-width: 1280px) 100vw, 1200px" className="object-cover" />
+            <Image src={activeImage.url} alt={activeImage.alt} fill sizes="(max-width: 1280px) 100vw, 1200px" className="object-cover" />
           </motion.div>
         </AnimatePresence>
 
@@ -53,8 +53,8 @@ export function CareerGallery({ images }: { images: CareerGalleryImage[] }) {
 
         {gallery.length > 1 && (
           <div className="absolute inset-x-4 top-1/2 flex -translate-y-1/2 justify-between md:inset-x-6">
-            <button type="button" onClick={() => move(-1)} aria-label="Fotografía anterior" className="grid size-11 place-items-center rounded-lg bg-white/95 text-[#0A496C] shadow-[0_4px_18px_rgba(7,58,87,0.2)] transition hover:bg-[#2CBEE7]"><ChevronLeft className="size-5" /></button>
-            <button type="button" onClick={() => move(1)} aria-label="Fotografía siguiente" className="grid size-11 place-items-center rounded-lg bg-white/95 text-[#0A496C] shadow-[0_4px_18px_rgba(7,58,87,0.2)] transition hover:bg-[#2CBEE7]"><ChevronRight className="size-5" /></button>
+            <button type="button" onClick={() => move(-1)} aria-label="Fotografía anterior" className="grid size-11 place-items-center rounded-lg bg-white/95 text-[#0A496C] shadow-[0_4px_18px_rgba(7,58,87,0.2)] transition-colors hover:bg-[#2CBEE7] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#2CBEE7]/40"><ChevronLeft className="size-5" aria-hidden="true" /></button>
+            <button type="button" onClick={() => move(1)} aria-label="Fotografía siguiente" className="grid size-11 place-items-center rounded-lg bg-white/95 text-[#0A496C] shadow-[0_4px_18px_rgba(7,58,87,0.2)] transition-colors hover:bg-[#2CBEE7] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#2CBEE7]/40"><ChevronRight className="size-5" aria-hidden="true" /></button>
           </div>
         )}
 
@@ -70,8 +70,8 @@ export function CareerGallery({ images }: { images: CareerGalleryImage[] }) {
           </div>
           <div className="mt-5 flex snap-x gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {gallery.map((image, index) => (
-              <button key={image.id} type="button" onClick={() => select(index)} aria-label={`Ver fotografía ${index + 1}: ${image.alt}`} aria-current={index === activeIndex} className={`relative h-20 w-28 shrink-0 snap-start overflow-hidden rounded-lg border-2 transition ${index === activeIndex ? "border-[#2CBEE7] opacity-100" : "border-transparent opacity-65 hover:opacity-100"}`}>
-                <Image src={image.url} alt="" fill unoptimized sizes="112px" className="object-cover" />
+              <button key={image.id} type="button" onClick={() => select(index)} aria-label={`Ver fotografía ${index + 1}: ${image.alt}`} aria-current={index === activeIndex} className={`relative h-20 w-28 shrink-0 snap-start overflow-hidden rounded-lg border-2 transition-[border-color,opacity] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#2CBEE7]/40 ${index === activeIndex ? "border-[#2CBEE7] opacity-100" : "border-transparent opacity-65 hover:opacity-100"}`}>
+                <Image src={image.url} alt="" fill sizes="112px" className="object-cover" />
               </button>
             ))}
           </div>

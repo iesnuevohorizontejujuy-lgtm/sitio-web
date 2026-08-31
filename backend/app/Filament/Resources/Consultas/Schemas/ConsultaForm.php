@@ -21,7 +21,6 @@ class ConsultaForm
                 TextInput::make('carrera.nombre')->label('Carrera')->disabled(),
                 TextInput::make('asunto')->disabled()->columnSpanFull(),
                 Textarea::make('mensaje')->disabled()->rows(8)->columnSpanFull(),
-                TextInput::make('horario_preferido')->label('Horario preferido')->disabled(),
                 TextInput::make('pagina_origen')->label('Página de origen')->disabled()->columnSpanFull(),
             ]),
             Section::make('Seguimiento')->columnSpan(1)->schema([

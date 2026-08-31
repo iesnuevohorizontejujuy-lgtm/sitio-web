@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./layout/NavBar";
@@ -19,7 +19,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  title: "IES Nuevo Horizonte | Educación Superior en Jujuy",
+  applicationName: "IES Nuevo Horizonte",
+  title: {
+    default: "IES Nuevo Horizonte | Educación Superior en Jujuy",
+    template: "%s | IES Nuevo Horizonte",
+  },
   description: "Instituto de Educación Superior Nuevo Horizonte. Formación técnica y profesional en San Salvador de Jujuy.",
   keywords: "IESNH, Instituto de Educación Superior Nuevo Horizonte, carreras, tecnicaturas, Jujuy, Argentina",
   openGraph: {
@@ -30,8 +34,21 @@ export const metadata: Metadata = {
     description: "Formación técnica y profesional en San Salvador de Jujuy.",
     images: [{ url: "/instituto.jpg", alt: "Instituto de Educación Superior Nuevo Horizonte" }],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "IES Nuevo Horizonte | Educación Superior en Jujuy",
+    description: "Formación técnica y profesional en San Salvador de Jujuy.",
+    images: ["/instituto.jpg"],
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
+export const viewport: Viewport = {
+  colorScheme: "light",
+  themeColor: "#F4F7F9",
+};
 
 export default function RootLayout({
   children,
@@ -52,6 +69,7 @@ export default function RootLayout({
       addressCountry: "AR",
     },
     telephone: institution.primaryPhone.label,
+    url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
     sameAs: [institution.social.facebook, institution.social.instagram],
   };
 
@@ -67,9 +85,14 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
+          <a href="#main-content" className="skip-to-content">
+            Ir al contenido principal
+          </a>
           <Navbar />
           <SiteNotices />
-          {children}
+          <div id="main-content" tabIndex={-1}>
+            {children}
+          </div>
           <Footer />
         </ThemeProvider>
       </body>

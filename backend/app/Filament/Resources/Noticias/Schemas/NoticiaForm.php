@@ -27,7 +27,7 @@ class NoticiaForm
                 FileUpload::make('imagen_principal_path')->label('Imagen principal')->disk('public')->directory('noticias')->image()->imageEditor()->maxSize(5120)->columnSpanFull(),
                 TextInput::make('video_url')->label('Video de YouTube o Vimeo')->url()->maxLength(1000)->columnSpanFull(),
             ]),
-            Section::make('Publicación')->columnSpan(1)->schema([
+            Section::make('Publicación y agenda')->description('Definí cómo aparecerá esta publicación en el sitio.')->columnSpan(1)->schema([
                 Select::make('categoria')->label('Tipo')->required()->native(false)->options([
                     'general' => 'Noticia general',
                     'actividad' => 'Actividad institucional',
@@ -36,7 +36,11 @@ class NoticiaForm
                     'convenio' => 'Convenio',
                     'fecha_importante' => 'Fecha importante',
                 ]),
-                DatePicker::make('fecha_evento')->label('Fecha de la actividad'),
+                DatePicker::make('fecha_evento')->label('Inicio de la actividad')->native(false)->displayFormat('d/m/Y')->helperText('Al indicar una fecha futura, la publicación aparecerá en la agenda.'),
+                DatePicker::make('fecha_fin_evento')->label('Finalización')->native(false)->displayFormat('d/m/Y')->afterOrEqual('fecha_evento'),
+                TextInput::make('lugar_evento')->label('Lugar')->maxLength(255)->placeholder('Por ejemplo: sede central, aula o institución'),
+                Toggle::make('destacada')->label('Destacar editorialmente')->default(false)->helperText('Puede ocupar el espacio principal de Noticias.'),
+                TextInput::make('orden_destacado')->label('Prioridad destacada')->numeric()->integer()->minValue(1)->maxValue(99)->helperText('1 aparece antes que 2. Dejalo vacío si no necesitás un orden específico.'),
                 Toggle::make('esta_publicada')->label('Publicar en el sitio')->default(false),
                 DateTimePicker::make('publicada_at')->label('Publicar desde')->seconds(false)->helperText('Opcional: permite programar la publicación.'),
             ]),

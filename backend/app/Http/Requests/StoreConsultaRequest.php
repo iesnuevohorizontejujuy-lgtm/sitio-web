@@ -30,7 +30,6 @@ class StoreConsultaRequest extends FormRequest
             'email' => ['nullable', 'email:rfc', 'max:255'],
             'asunto' => ['nullable', 'string', 'max:180'],
             'mensaje' => ['required', 'string', 'min:10', 'max:3000'],
-            'horario_preferido' => ['nullable', 'string', 'max:120'],
             'pagina_origen' => ['nullable', 'url', 'max:1000'],
             'acepta_contacto' => ['accepted'],
             'website' => ['prohibited'],

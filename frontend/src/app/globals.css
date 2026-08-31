@@ -4,6 +4,10 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --ies-surface-canvas: #F4F7F9;
+  --ies-surface-muted: #EAF1F5;
+  --ies-surface-brand: #E0ECF8;
+  --ies-surface-paper: #FFFFFF;
   --background: oklch(1.0000 0 0);
   --foreground: oklch(0.1884 0.0128 248.5103);
   --card: oklch(0.9784 0.0011 197.1387);
@@ -56,6 +60,29 @@
   --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+}
+
+@media (min-width: 640px) {
+  .institutional-menu-shape {
+    -webkit-mask-image: url("/menu-panel-mask.svg");
+    mask-image: url("/menu-panel-mask.svg");
+    -webkit-mask-position: left top;
+    mask-position: left top;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    filter: drop-shadow(14px 0 24px rgb(3 31 48 / 24%));
+  }
+}
+
+.institutional-menu-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.institutional-menu-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .dark {
@@ -224,11 +251,62 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 8rem;
+}
+
+a,
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgb(44 190 231 / 18%);
+}
+
+#main-content:focus {
+  outline: none;
+}
+
+.skip-to-content {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 200;
+  min-height: 2.75rem;
+  transform: translateY(calc(-100% - 1rem));
+  border-radius: 0.5rem;
+  background: #FFFFFF;
+  padding: 0.75rem 1rem;
+  color: #0A496C;
+  font-size: 0.875rem;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgb(3 29 44 / 24%);
+  transition: transform 160ms ease-out;
+}
+
+.skip-to-content:focus-visible {
+  transform: translateY(0);
+  outline: 3px solid #2CBEE7;
+  outline-offset: 2px;
 }
 
 .institutional-shell {
   color-scheme: light;
+  background-color: var(--ies-surface-canvas);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.institutional-surface-canvas {
+  background-color: var(--ies-surface-canvas);
+}
+
+.institutional-surface-muted {
+  background-color: var(--ies-surface-muted);
+}
+
+.institutional-surface-brand {
+  background-color: var(--ies-surface-brand);
+}
+
+.institutional-surface-paper {
+  background-color: var(--ies-surface-paper);
 }
 
 .institutional-shell h1,

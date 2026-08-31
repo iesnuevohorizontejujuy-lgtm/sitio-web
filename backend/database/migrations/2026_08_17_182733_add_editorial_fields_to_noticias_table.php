@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('noticias', function (Blueprint $table) {
+            $table->date('fecha_fin_evento')->nullable()->after('fecha_evento');
+            $table->string('lugar_evento')->nullable()->after('fecha_fin_evento');
+            $table->boolean('destacada')->default(false)->index()->after('video_url');
+            $table->unsignedSmallInteger('orden_destacado')->nullable()->index()->after('destacada');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('noticias', function (Blueprint $table) {
+            $table->dropColumn([
+                'fecha_fin_evento',
+                'lugar_evento',
+                'destacada',
+                'orden_destacado',
+            ]);
+        });
+    }
+};

@@ -26,6 +26,10 @@ class NoticiaFactory extends Factory
             'contenido' => '<p>'.fake()->paragraphs(3, true).'</p>',
             'categoria' => 'general',
             'fecha_evento' => null,
+            'fecha_fin_evento' => null,
+            'lugar_evento' => null,
+            'destacada' => false,
+            'orden_destacado' => null,
             'esta_publicada' => true,
             'publicada_at' => now(),
         ];

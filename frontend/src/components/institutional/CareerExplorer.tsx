@@ -8,6 +8,8 @@ import { CareerCard } from "./CareerCard";
 
 interface CareerExplorerProps {
   careers: Career[];
+  initialArea?: (typeof careerAreas)[number];
+  initialQuery?: string;
 }
 
 const normalize = (value: string) =>
@@ -16,9 +18,9 @@ const normalize = (value: string) =>
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 
-export function CareerExplorer({ careers }: CareerExplorerProps) {
-  const [query, setQuery] = useState("");
-  const [area, setArea] = useState<(typeof careerAreas)[number]>("Todas");
+export function CareerExplorer({ careers, initialArea = "Todas", initialQuery = "" }: CareerExplorerProps) {
+  const [query, setQuery] = useState(initialQuery);
+  const [area, setArea] = useState<(typeof careerAreas)[number]>(initialArea);
 
   const filteredCareers = useMemo(() => {
     const normalizedQuery = normalize(query.trim());
@@ -43,23 +45,25 @@ export function CareerExplorer({ careers }: CareerExplorerProps) {
             />
             <input
               type="search"
+              name="buscar"
+              autoComplete="off"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Buscar por nombre…"
               className="h-12 w-full rounded-lg border border-[#CBD5E1] bg-white pl-12 pr-4 text-[#121C28] outline-none transition focus:border-[#0A496C] focus:ring-2 focus:ring-[#2CBEE7]/30"
             />
           </label>
-          <div className="flex gap-x-7 gap-y-3 overflow-x-auto pb-1" aria-label="Filtrar carreras por área">
+          <div className="flex gap-x-4 gap-y-3 overflow-x-auto pb-1" aria-label="Filtrar carreras por área">
             {careerAreas.map((option) => (
               <button
                 key={option}
                 type="button"
                 onClick={() => setArea(option)}
                 aria-pressed={area === option}
-                className={`shrink-0 border-b-2 pb-2 text-sm font-semibold transition-colors ${
+                className={`min-h-11 shrink-0 border-b-2 px-1 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2CBEE7] ${
                   area === option
                     ? "border-[#0A496C] text-[#0A496C]"
-                    : "border-transparent text-[#64748B] hover:text-[#0A496C]"
+                    : "border-transparent text-[#52606D] hover:text-[#0A496C]"
                 }`}
               >
                 {option}
@@ -70,7 +74,7 @@ export function CareerExplorer({ careers }: CareerExplorerProps) {
       </div>
 
       {filteredCareers.length > 0 ? (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" aria-live="polite">
           {filteredCareers.map((career) => (
             <CareerCard
               key={career.slug}

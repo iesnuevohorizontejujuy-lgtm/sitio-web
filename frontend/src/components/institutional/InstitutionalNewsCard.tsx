@@ -3,73 +3,80 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays, Newspaper } from "lucide-react";
 import {
   formatInstitutionalDate,
-  stripInstitutionalHtml,
+  getInstitutionalDateParts,
+  getInstitutionalExcerpt,
+  getInstitutionalItemDate,
+  institutionalCategoryLabels,
+  isInstitutionalEvent,
 } from "@/lib/institutional-news";
 import type { InstitutionalNewsItem } from "@/types/institutional-news";
 
 interface InstitutionalNewsCardProps {
   item: InstitutionalNewsItem;
   featured?: boolean;
+  variant?: "card" | "row";
 }
 
-export function InstitutionalNewsCard({
-  item,
-  featured = false,
-}: InstitutionalNewsCardProps) {
-  const isEvent = item.categoria === "fecha_importante";
-  const date = isEvent && item.fecha_evento
-    ? item.fecha_evento
-    : item.created_at;
-  const excerpt = stripInstitutionalHtml(item.contenido);
-  const categoryLabel = {
-    general: "Actualidad",
-    actividad: "Actividad",
-    jornada: "Jornada",
-    practica: "Práctica profesional",
-    convenio: "Convenio",
-    fecha_importante: "Agenda",
-  }[item.categoria];
+export function InstitutionalNewsCard({ item, featured = false, variant = "card" }: InstitutionalNewsCardProps) {
+  const isEvent = isInstitutionalEvent(item);
+  const date = getInstitutionalItemDate(item);
+  const excerpt = getInstitutionalExcerpt(item, featured ? 260 : 175);
+  const href = `/vida-institucional/${item.slug}`;
+
+  if (variant === "row") {
+    const dateParts = getInstitutionalDateParts(date);
+    return (
+      <article className="group grid min-w-0 gap-5 border-t border-[#C6D7E5] py-6 sm:grid-cols-[72px_1fr] lg:grid-cols-[72px_1fr_190px] lg:items-center">
+        <time dateTime={date} className="hidden border-r border-[#C6D7E5] pr-5 text-center sm:block">
+          <span className="block text-3xl font-semibold tabular-nums tracking-[-0.04em] text-[#0A496C]">{dateParts.day}</span>
+          <span className="mt-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0A6F94]">{dateParts.month} {dateParts.year}</span>
+        </time>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#0A6F94]">
+            <span>{institutionalCategoryLabels[item.categoria]}</span>
+            <span className="sm:hidden">· {formatInstitutionalDate(date)}</span>
+          </div>
+          <h3 className="mt-2 text-balance text-xl font-semibold leading-snug tracking-[-0.02em] text-[#0A496C]">
+            <Link href={href} className="hover:underline">{item.titulo}</Link>
+          </h3>
+          {excerpt ? <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#52606D]">{excerpt}</p> : null}
+          <Link href={href} className="mt-3 inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-[#0A496C] underline decoration-[#2CBEE7] decoration-2 underline-offset-4">
+            Leer publicación <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+          </Link>
+        </div>
+        <Link href={href} tabIndex={-1} aria-hidden="true" className="relative hidden aspect-[16/10] overflow-hidden rounded-lg bg-[#E0ECF8] lg:block">
+          {item.imagen_thumb || item.imagen_principal ? (
+            <Image src={item.imagen_thumb || item.imagen_principal || ""} alt="" fill sizes="190px" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+          ) : (
+            <span className="grid h-full place-items-center text-[#0A496C]">{isEvent ? <CalendarDays className="size-8" aria-hidden="true" /> : <Newspaper className="size-8" aria-hidden="true" />}</span>
+          )}
+        </Link>
+      </article>
+    );
+  }
 
   return (
-    <article className={`group overflow-hidden rounded-xl border border-[#CBD5E1] bg-white ${featured ? "md:grid md:grid-cols-2" : "flex h-full flex-col"}`}>
-      <Link
-        href={`/vida-institucional/${item.slug}`}
-        className={`relative block overflow-hidden bg-[#E0ECF8] ${featured ? "min-h-72" : "aspect-[16/10]"}`}
-      >
+    <article className={`group flex h-full min-w-0 flex-col border-t-[3px] border-[#0A496C] pt-4 ${featured ? "md:grid md:grid-cols-2" : ""}`}>
+      <Link href={href} className={`relative block overflow-hidden rounded-md bg-[#E0ECF8] ${featured ? "min-h-72" : "aspect-[16/9]"}`}>
         {item.imagen_principal ? (
-          <Image
-            src={item.imagen_principal}
-            alt={item.titulo}
-            fill
-            unoptimized
-            sizes={featured ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 100vw, 33vw"}
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-          />
+          <Image src={item.imagen_principal} alt={item.titulo} fill sizes={featured ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 100vw, 33vw"} className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
         ) : (
-          <div className="flex h-full items-center justify-center text-[#0A496C]">
-            {isEvent ? <CalendarDays className="size-12" /> : <Newspaper className="size-12" />}
-          </div>
+          <span className="flex h-full items-center justify-center text-[#0A496C]">{isEvent ? <CalendarDays className="size-12" aria-hidden="true" /> : <Newspaper className="size-12" aria-hidden="true" />}</span>
         )}
       </Link>
 
-      <div className={`flex flex-1 flex-col ${featured ? "p-8 md:p-10" : "p-6"}`}>
+      <div className={`flex flex-1 flex-col ${featured ? "py-7 md:px-8 md:py-2" : "pt-5"}`}>
         <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.12em]">
-          <span className="text-[#0A496C]">{categoryLabel}</span>
-          <span className="size-1 rounded-full bg-[#2CBEE7]" />
-          <time dateTime={date} className="text-[#64748B]">{formatInstitutionalDate(date)}</time>
+          <span className="text-[#0A6F94]">{institutionalCategoryLabels[item.categoria]}</span>
+          <span className="size-1 rounded-full bg-[#2CBEE7]" aria-hidden="true" />
+          <time dateTime={date} className="text-[#52606D]">{formatInstitutionalDate(date)}</time>
         </div>
-        <h2 className={`${featured ? "mt-5 text-3xl" : "mt-4 text-xl"} font-semibold leading-tight tracking-[-0.02em] text-[#0A496C]`}>
-          <Link href={`/vida-institucional/${item.slug}`} className="hover:underline">
-            {item.titulo}
-          </Link>
-        </h2>
-        {excerpt && (
-          <p className={`mt-4 leading-7 text-[#52606D] ${featured ? "line-clamp-4" : "line-clamp-3"}`}>
-            {excerpt}
-          </p>
-        )}
-        <Link href={`/vida-institucional/${item.slug}`} className="mt-auto inline-flex items-center gap-2 pt-7 text-sm font-semibold text-[#0A496C]">
-          Leer publicación <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+        <h3 className={`${featured ? "mt-5 text-3xl" : "mt-3 text-xl"} text-balance font-semibold leading-tight tracking-[-0.02em] text-[#0A496C]`}>
+          <Link href={href} className="hover:underline">{item.titulo}</Link>
+        </h3>
+        {excerpt ? <p className={`mt-3 leading-6 text-[#52606D] ${featured ? "line-clamp-4" : "line-clamp-3 text-sm"}`}>{excerpt}</p> : null}
+        <Link href={href} className="mt-auto inline-flex min-h-11 items-center gap-2 pt-5 text-sm font-semibold text-[#0A496C] underline decoration-[#2CBEE7] decoration-2 underline-offset-4">
+          Leer publicación <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
         </Link>
       </div>
     </article>

@@ -12,6 +12,7 @@ it('stores a valid career inquiry for the Filament panel', function () {
         'telefono' => '+54 9 388 555-1234',
         'email' => 'ana@example.com',
         'mensaje' => 'Quisiera conocer los requisitos para inscribirme.',
+        'horario_preferido' => 'Este campo ya no debe guardarse',
         'pagina_origen' => 'http://localhost:3000/carreras/'.$career->slug,
         'acepta_contacto' => true,
     ])->assertCreated()->assertJsonPath('consulta.estado', 'nueva');
@@ -19,7 +20,8 @@ it('stores a valid career inquiry for the Filament panel', function () {
     $inquiry = Consulta::first();
     expect($inquiry)->not->toBeNull()
         ->and($inquiry->carrera_id)->toBe($career->id)
-        ->and($inquiry->estado)->toBe('nueva');
+        ->and($inquiry->estado)->toBe('nueva')
+        ->and($inquiry->horario_preferido)->toBeNull();
 });
 
 it('validates consent and contact details', function () {

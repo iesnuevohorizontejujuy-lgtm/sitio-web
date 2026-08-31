@@ -3,6 +3,7 @@ import { academicApiFetch } from "@/lib/academic-api";
 
 type ExamPermitPayload = {
   carrera_id?: unknown;
+  turno?: unknown;
   apellido?: unknown;
   nombres?: unknown;
   dni?: unknown;
@@ -26,6 +27,7 @@ export async function POST(request: NextRequest) {
 
   const valid =
     (typeof payload.carrera_id === "number" || /^\d+$/.test(String(payload.carrera_id))) &&
+    isFilledString(payload.turno) &&
     isFilledString(payload.apellido) &&
     isFilledString(payload.nombres) &&
     isFilledString(payload.dni) &&

@@ -6,7 +6,10 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [careers, news] = await Promise.all([getCareers(), getInstitutionalNews()]);
-  const staticRoutes = ["", "/institucion", "/carreras", "/ingresantes", "/permisos-examen", "/vida-institucional", "/noticias"];
+  const staticRoutes = ["", "/institucion", "/carreras", "/ingresantes", "/permisos-examen", "/vida-institucional"];
+  const publicNews = [...news.noticias, ...news.agenda].filter(
+    (item, index, items) => items.findIndex((candidate) => candidate.slug === item.slug) === index,
+  );
 
   return [
     ...staticRoutes.map((route) => ({
@@ -19,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
-    ...[...news.generales, ...news.fechas_importantes].map((item) => ({
+    ...publicNews.map((item) => ({
       url: `${siteUrl}/vida-institucional/${item.slug}`,
       lastModified: new Date(item.created_at),
       changeFrequency: "yearly" as const,

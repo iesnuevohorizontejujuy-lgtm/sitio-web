@@ -2,14 +2,21 @@
 
 use App\Filament\Resources\Autoridads\Pages\ListAutoridads;
 use App\Filament\Resources\AvisoSitios\Pages\ListAvisoSitios;
+use App\Filament\Resources\Carreras\Pages\CreateCarrera;
 use App\Filament\Resources\Carreras\Pages\ListCarreras;
 use App\Filament\Resources\Consultas\Pages\ListConsultas;
 use App\Filament\Resources\ConvocatoriaIngresos\Pages\ListConvocatoriaIngresos;
+use App\Filament\Resources\DiapositivaPortadas\Pages\CreateDiapositivaPortada;
+use App\Filament\Resources\DiapositivaPortadas\Pages\ListDiapositivaPortadas;
+use App\Filament\Resources\Noticias\Pages\CreateNoticia;
+use App\Filament\Resources\Noticias\Pages\ListNoticias;
 use App\Models\Autoridad;
 use App\Models\AvisoSitio;
 use App\Models\Carrera;
 use App\Models\Consulta;
 use App\Models\ConvocatoriaIngreso;
+use App\Models\DiapositivaPortada;
+use App\Models\Noticia;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -26,6 +33,9 @@ it('lists careers in the CMS', function () {
         ->assertCanSeeTableRecords($careers)
         ->assertTableColumnExists('nombre')
         ->assertTableColumnExists('resolucion');
+
+    Livewire::test(CreateCarrera::class)
+        ->assertFormFieldExists('imagen_portada_path');
 });
 
 it('lists inquiries and can mark one as answered', function () {
@@ -69,4 +79,42 @@ it('lists site notices in the CMS', function () {
         ->assertTableColumnExists('titulo')
         ->assertTableColumnExists('presentacion')
         ->assertTableColumnExists('publicado');
+});
+
+it('manages editorial priority and agenda data for news', function () {
+    $news = Noticia::factory()->create([
+        'destacada' => true,
+        'orden_destacado' => 1,
+    ]);
+
+    Livewire::test(ListNoticias::class)
+        ->assertCanSeeTableRecords([$news])
+        ->assertTableColumnExists('destacada')
+        ->assertTableColumnExists('orden_destacado')
+        ->assertTableColumnExists('fecha_evento');
+
+    Livewire::test(CreateNoticia::class)
+        ->assertFormFieldExists('fecha_evento')
+        ->assertFormFieldExists('fecha_fin_evento')
+        ->assertFormFieldExists('lugar_evento')
+        ->assertFormFieldExists('destacada')
+        ->assertFormFieldExists('orden_destacado');
+});
+
+it('manages responsive homepage slides in the CMS', function () {
+    $slides = DiapositivaPortada::factory()->count(2)->create();
+
+    Livewire::test(ListDiapositivaPortadas::class)
+        ->assertCanSeeTableRecords($slides)
+        ->assertTableColumnExists('titulo')
+        ->assertTableColumnExists('orden')
+        ->assertTableColumnExists('imagen_movil_path')
+        ->assertTableColumnExists('publicada');
+
+    Livewire::test(CreateDiapositivaPortada::class)
+        ->assertFormFieldExists('imagen_escritorio_path')
+        ->assertFormFieldExists('imagen_movil_path')
+        ->assertFormFieldExists('imagen_alt')
+        ->assertFormFieldExists('inicia_at')
+        ->assertFormFieldExists('finaliza_at');
 });

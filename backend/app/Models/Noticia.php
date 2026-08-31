@@ -13,16 +13,24 @@ class Noticia extends Model
     use HasFactory;
 
     protected $fillable = [
-        'titulo', 'slug', 'contenido', 'categoria', 'fecha_evento',
-        'imagen_principal_path', 'video_url', 'esta_publicada', 'publicada_at',
+        'titulo', 'slug', 'contenido', 'categoria', 'fecha_evento', 'fecha_fin_evento',
+        'lugar_evento', 'imagen_principal_path', 'video_url', 'destacada',
+        'orden_destacado', 'esta_publicada', 'publicada_at',
     ];
 
-    protected $attributes = ['categoria' => 'general', 'esta_publicada' => false];
+    protected $attributes = [
+        'categoria' => 'general',
+        'destacada' => false,
+        'esta_publicada' => false,
+    ];
 
     protected function casts(): array
     {
         return [
             'fecha_evento' => 'date',
+            'fecha_fin_evento' => 'date',
+            'destacada' => 'boolean',
+            'orden_destacado' => 'integer',
             'esta_publicada' => 'boolean',
             'publicada_at' => 'datetime',
         ];

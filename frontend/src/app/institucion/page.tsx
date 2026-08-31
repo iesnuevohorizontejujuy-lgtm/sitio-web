@@ -14,14 +14,18 @@ import {
 } from "lucide-react";
 import { InstitutionalCarousel } from "@/components/institutional/InstitutionalCarousel";
 import { InstitutionalNewsCard } from "@/components/institutional/InstitutionalNewsCard";
+import { InstitutionalPageMasthead } from "@/components/institutional/InstitutionalPageMasthead";
+import { InstitutionalPageNav } from "@/components/institutional/InstitutionalPageNav";
+import { InstitutionalSectionHeading } from "@/components/institutional/InstitutionalSectionHeading";
 import { MotionReveal } from "@/components/institutional/MotionReveal";
 import { institution, whatsappHref } from "@/config/institution";
 import { getAuthorities } from "@/lib/authorities";
 import { getInstitutionalNews } from "@/lib/institutional-news";
 
 export const metadata: Metadata = {
-  title: "Institución | IES Nuevo Horizonte",
+  title: "Institución",
   description: "Conocé la propuesta institucional, el acompañamiento y la formación profesional del IES Nuevo Horizonte en San Salvador de Jujuy.",
+  alternates: { canonical: "/institucion" },
 };
 
 const principles = [
@@ -45,38 +49,38 @@ const principles = [
 export default async function InstitutionPage() {
   const [authorities, news] = await Promise.all([getAuthorities(), getInstitutionalNews()]);
   const agreements = news.generales.filter((item) => item.categoria === "convenio").slice(0, 3);
+  const pageNavItems = [
+    { href: "#propuesta" as const, label: "Propuesta educativa" },
+    ...(authorities.length > 0 ? [{ href: "#autoridades" as const, label: "Autoridades" }] : []),
+    { href: "#comunidad" as const, label: "Comunidad" },
+    ...(agreements.length > 0 ? [{ href: "#convenios" as const, label: "Convenios" }] : []),
+    { href: "#ubicacion" as const, label: "Cómo llegar" },
+  ];
 
   return (
-    <main className="institutional-shell bg-white text-[#121C28]">
-      <section className="border-b border-[#D8E1E8]">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-12 lg:px-8 lg:py-24">
-          <MotionReveal className="lg:col-span-5">
-            <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#0A496C]"><span className="h-0.5 w-9 bg-[#2CBEE7]" />Nuestra institución</p>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.08] tracking-[-0.035em] text-[#0A496C] sm:text-5xl lg:text-6xl">Educación cercana, oportunidades reales</h1>
-            <p className="mt-7 text-lg leading-8 text-[#52606D]">Somos una comunidad educativa de San Salvador de Jujuy comprometida con la formación técnica, el acompañamiento y el crecimiento profesional de cada estudiante.</p>
-            <div className="mt-8 flex items-start gap-3 border-l-4 border-[#2CBEE7] bg-[#F7F9FB] p-5 text-sm leading-6 text-[#52606D]">
-              <MapPin className="mt-0.5 size-5 shrink-0 text-[#0A496C]" />
-              <span>{institution.address}, {institution.city}</span>
-            </div>
-          </MotionReveal>
-          <MotionReveal className="relative lg:col-span-7" delay={0.12}>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#B7CADB] bg-[#E0ECF8]">
-              <Image src="/instituto.jpg" alt="Instalaciones del IES Nuevo Horizonte" fill priority sizes="(max-width: 1024px) 100vw, 58vw" className="object-cover" />
-            </div>
-            <div className="absolute bottom-5 left-5 border-l-4 border-[#2CBEE7] bg-white px-5 py-4 shadow-[0_4px_20px_rgba(10,73,108,0.10)]">
-              <p className="font-semibold text-[#0A496C]">IES Nuevo Horizonte</p>
-              <p className="mt-1 text-sm text-[#52606D]">San Salvador de Jujuy</p>
-            </div>
-          </MotionReveal>
-        </div>
-      </section>
+    <main className="institutional-shell text-[#121C28]">
+      <InstitutionalPageMasthead
+        eyebrow="Nuestra institución"
+        title="Educación cercana, oportunidades reales"
+        description="Somos una comunidad educativa de San Salvador de Jujuy comprometida con la formación técnica, el acompañamiento y el crecimiento profesional de cada estudiante."
+        image="/instituto.jpg"
+        imageAlt="Instalaciones del IES Nuevo Horizonte"
+        caption={{ eyebrow: "IES Nuevo Horizonte", title: "Una institución de educación superior comprometida con Jujuy" }}
+        priority
+      >
+        <p className="flex items-start gap-3 text-sm leading-6 text-[#52606D]"><MapPin className="mt-0.5 size-5 shrink-0 text-[#0A6F94]" aria-hidden="true" /><span>{institution.address}, {institution.city}</span></p>
+      </InstitutionalPageMasthead>
 
-      <section className="py-20 md:py-24">
+      <InstitutionalPageNav items={pageNavItems} />
+
+      <section id="propuesta" className="institutional-surface-muted py-20 md:py-24">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <MotionReveal className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]">Cómo enseñamos</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Una propuesta que acompaña cada trayectoria</h2>
-            <p className="mt-5 text-lg leading-8 text-[#52606D]">La experiencia educativa combina conocimientos, práctica y vínculos cercanos para que cada estudiante pueda avanzar con confianza hacia su futuro profesional.</p>
+            <InstitutionalSectionHeading
+              eyebrow="Cómo enseñamos"
+              title="Una propuesta que acompaña cada trayectoria"
+              description="La experiencia educativa combina conocimientos, práctica y vínculos cercanos para que cada estudiante pueda avanzar con confianza hacia su futuro profesional."
+            />
           </MotionReveal>
           <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-[#CBD5E1] bg-[#CBD5E1] md:grid-cols-3">
             {principles.map((principle, index) => (
@@ -93,8 +97,7 @@ export default async function InstitutionPage() {
       <section className="bg-[#0A496C] py-20 text-white md:py-24">
         <div className="mx-auto grid max-w-7xl items-start gap-12 px-5 lg:grid-cols-2 lg:gap-20 lg:px-8">
           <MotionReveal>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#2CBEE7]">Nuestro propósito</p>
-            <h2 className="mt-5 text-3xl font-semibold leading-tight tracking-[-0.025em] md:text-4xl">Formar profesionales que puedan transformar su entorno</h2>
+            <InstitutionalSectionHeading eyebrow="Nuestro propósito" title="Formar profesionales que puedan transformar su entorno" inverse />
           </MotionReveal>
           <MotionReveal className="space-y-7 text-lg leading-8 text-white/75" delay={0.1}>
             <p>Promovemos una educación superior accesible y vinculada con Jujuy, capaz de brindar herramientas concretas para el trabajo y la participación en la comunidad.</p>
@@ -104,18 +107,20 @@ export default async function InstitutionPage() {
       </section>
 
       {authorities.length > 0 && (
-        <section className="border-b border-[#D8E1E8] bg-[#F7F9FB] py-20 md:py-24">
+        <section id="autoridades" className="institutional-surface-brand border-b border-[#C6D7E5] py-20 md:py-24">
           <div className="mx-auto max-w-7xl px-5 lg:px-8">
             <MotionReveal className="max-w-3xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]">Organización institucional</p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Autoridades</h2>
-              <p className="mt-5 leading-7 text-[#52606D]">Conocé al equipo responsable de conducir y acompañar el proyecto educativo del instituto.</p>
+              <InstitutionalSectionHeading
+                eyebrow="Organización institucional"
+                title="Autoridades"
+                description="Conocé al equipo responsable de conducir y acompañar el proyecto educativo del instituto."
+              />
             </MotionReveal>
             <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-[#CBD5E1] bg-[#CBD5E1] sm:grid-cols-2 lg:grid-cols-3">
               {authorities.map((authority, index) => (
                 <MotionReveal key={authority.id} className="flex h-full gap-5 bg-white p-6" delay={index * 0.06}>
                   <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-[#E0ECF8]">
-                    {authority.imagen ? <Image src={authority.imagen} alt={`Fotografía de ${authority.nombre}`} fill unoptimized sizes="80px" className="object-cover" /> : <UsersRound className="absolute left-1/2 top-1/2 size-8 -translate-x-1/2 -translate-y-1/2 text-[#0A496C]" />}
+                    {authority.imagen ? <Image src={authority.imagen} alt={`Fotografía de ${authority.nombre}`} fill sizes="80px" className="object-cover" /> : <UsersRound className="absolute left-1/2 top-1/2 size-8 -translate-x-1/2 -translate-y-1/2 text-[#0A496C]" aria-hidden="true" />}
                   </div>
                   <div>
                     <h3 className="font-semibold text-[#0A496C]">{authority.nombre}</h3>
@@ -129,29 +134,29 @@ export default async function InstitutionPage() {
         </section>
       )}
 
-      <section className="py-20 md:py-24">
+      <section id="comunidad" className="institutional-surface-canvas py-20 md:py-24">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <MotionReveal className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
-            <div>
-              <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]"><span className="h-0.5 w-8 bg-[#2CBEE7]" />Nuestra comunidad</p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Aprender, compartir y crecer</h2>
-            </div>
-            <Link href="/vida-institucional" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C]">Conocé la vida institucional <ArrowRight className="size-4" /></Link>
+          <MotionReveal className="mb-10">
+            <InstitutionalSectionHeading
+              eyebrow="Nuestra comunidad"
+              title="Aprender, compartir y crecer"
+              action={<Link href="/vida-institucional" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C]">Conocé la vida institucional <ArrowRight className="size-4" /></Link>}
+            />
           </MotionReveal>
           <MotionReveal delay={0.08}><InstitutionalCarousel /></MotionReveal>
         </div>
       </section>
 
       {agreements.length > 0 && (
-        <section className="border-y border-[#D8E1E8] bg-[#F7F9FB] py-20 md:py-24">
+        <section id="convenios" className="institutional-surface-muted border-y border-[#D8E1E8] py-20 md:py-24">
           <div className="mx-auto max-w-7xl px-5 lg:px-8">
-            <MotionReveal className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]">Vinculación</p>
-                <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Convenios institucionales</h2>
-                <p className="mt-5 max-w-2xl leading-7 text-[#52606D]">Acuerdos y vínculos que amplían las experiencias formativas de nuestra comunidad.</p>
-              </div>
-              <Link href="/vida-institucional" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C]">Ver actualidad institucional <ArrowRight className="size-4" /></Link>
+            <MotionReveal>
+              <InstitutionalSectionHeading
+                eyebrow="Vinculación"
+                title="Convenios institucionales"
+                description="Acuerdos y vínculos que amplían las experiencias formativas de nuestra comunidad."
+                action={<Link href="/vida-institucional" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0A496C]">Ver actualidad institucional <ArrowRight className="size-4" /></Link>}
+              />
             </MotionReveal>
             <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {agreements.map((agreement) => <InstitutionalNewsCard key={agreement.id} item={agreement} />)}
@@ -160,7 +165,7 @@ export default async function InstitutionPage() {
         </section>
       )}
 
-      <section className="border-y border-[#D8E1E8] bg-[#F7F9FB] py-16">
+      <section className="institutional-surface-brand border-y border-[#C6D7E5] py-16">
         <div className="mx-auto grid max-w-7xl gap-6 px-5 md:grid-cols-3 lg:px-8">
           <MotionReveal className="flex items-center gap-4"><Building2 className="size-8 text-[#0A496C]" /><div><p className="font-semibold text-[#0A496C]">Entorno profesional</p><p className="mt-1 text-sm text-[#52606D]">Espacios para aprender haciendo.</p></div></MotionReveal>
           <MotionReveal className="flex items-center gap-4" delay={0.06}><UsersRound className="size-8 text-[#0A496C]" /><div><p className="font-semibold text-[#0A496C]">Comunidad cercana</p><p className="mt-1 text-sm text-[#52606D]">Acompañamiento durante el recorrido.</p></div></MotionReveal>
@@ -168,12 +173,14 @@ export default async function InstitutionPage() {
         </div>
       </section>
 
-      <section className="py-20 md:py-24">
+      <section id="ubicacion" className="institutional-surface-canvas py-20 md:py-24">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <MotionReveal className="mb-10 max-w-3xl">
-            <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#0A496C]"><span className="h-0.5 w-8 bg-[#2CBEE7]" />Cómo llegar</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-[#0A496C] md:text-4xl">Encontranos en Alto Comedero</h2>
-            <p className="mt-5 text-lg leading-8 text-[#52606D]">El instituto se encuentra en barrio 47 Hectáreas, con acceso mediante distintas líneas de transporte urbano.</p>
+            <InstitutionalSectionHeading
+              eyebrow="Cómo llegar"
+              title="Encontranos en Alto Comedero"
+              description="El instituto se encuentra en barrio 47 Hectáreas, con acceso mediante distintas líneas de transporte urbano."
+            />
           </MotionReveal>
 
           <div className="grid overflow-hidden rounded-2xl border border-[#B7CADB] bg-white lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.8fr)]">
@@ -227,7 +234,7 @@ export default async function InstitutionPage() {
         </div>
       </section>
 
-      <section className="px-5 pb-20 lg:px-8">
+      <section className="institutional-surface-canvas px-5 pb-20 lg:px-8">
         <MotionReveal className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 rounded-2xl bg-[#0A496C] px-7 py-12 text-white md:flex-row md:items-center md:px-12">
           <div>
             <h2 className="text-3xl font-semibold tracking-[-0.025em]">¿Querés formar parte?</h2>

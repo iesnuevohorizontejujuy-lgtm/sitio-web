@@ -63,7 +63,7 @@ class AvisoSitioForm
                             'carreras' => 'Carreras y sus detalles',
                             'ingresantes' => 'Ingresantes',
                             'vida_institucional' => 'Vida institucional y publicaciones',
-                        ])->default(['todas'])->helperText('Los avisos nunca se muestran dentro del Campus.'),
+                        ])->default(['todas']),
                     ]),
                 Section::make('Programación')
                     ->columnSpan(1)

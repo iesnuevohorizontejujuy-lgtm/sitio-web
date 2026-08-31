@@ -21,6 +21,7 @@ export const institution = {
       "https://www.facebook.com/InstitutoDeEducacionSuperiorNuevoHorizonte",
     instagram: "https://www.instagram.com/iesnuevohorizonte/",
   },
+  academicSystemUrl: "https://sga.iesnuevohorizonte.com",
 } as const;
 
 export const whatsappHref = (message: string) =>

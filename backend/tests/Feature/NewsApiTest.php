@@ -10,12 +10,49 @@ it('groups published news and important dates for the website', function () {
 
     $this->getJson('/api/noticias')
         ->assertSuccessful()
+        ->assertJsonCount(0, 'destacadas')
+        ->assertJsonCount(1, 'agenda')
+        ->assertJsonCount(2, 'noticias')
         ->assertJsonCount(2, 'generales')
         ->assertJsonCount(1, 'fechas_importantes')
-        ->assertJsonPath('generales.0.slug', 'actividad-publicada')
         ->assertJsonPath('fechas_importantes.0.slug', 'fecha-importante')
+        ->assertJsonFragment(['slug' => 'actividad-publicada', 'categoria' => 'general'])
         ->assertJsonFragment(['slug' => 'convenio-publicado', 'categoria' => 'convenio'])
         ->assertJsonMissing(['slug' => 'borrador']);
+});
+
+it('orders featured publications and upcoming agenda items for the website', function () {
+    Noticia::factory()->create([
+        'slug' => 'destacada-segunda',
+        'destacada' => true,
+        'orden_destacado' => 2,
+    ]);
+    Noticia::factory()->create([
+        'slug' => 'destacada-primera',
+        'destacada' => true,
+        'orden_destacado' => 1,
+    ]);
+    Noticia::factory()->create([
+        'slug' => 'agenda-posterior',
+        'categoria' => 'jornada',
+        'fecha_evento' => now()->addDays(5),
+        'fecha_fin_evento' => now()->addDays(6),
+        'lugar_evento' => 'Sede central',
+    ]);
+    Noticia::factory()->create([
+        'slug' => 'agenda-proxima',
+        'categoria' => 'actividad',
+        'fecha_evento' => now()->addDays(2),
+    ]);
+
+    $this->getJson('/api/noticias')
+        ->assertSuccessful()
+        ->assertJsonPath('destacadas.0.slug', 'destacada-primera')
+        ->assertJsonPath('destacadas.1.slug', 'destacada-segunda')
+        ->assertJsonPath('agenda.0.slug', 'agenda-proxima')
+        ->assertJsonPath('agenda.1.slug', 'agenda-posterior')
+        ->assertJsonPath('agenda.1.fecha_fin_evento', now()->addDays(6)->toDateString())
+        ->assertJsonPath('agenda.1.lugar_evento', 'Sede central');
 });
 
 it('shows only a published news item by slug', function () {

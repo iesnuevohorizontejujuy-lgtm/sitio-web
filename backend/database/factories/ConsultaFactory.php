@@ -25,7 +25,6 @@ class ConsultaFactory extends Factory
             'email' => fake()->safeEmail(),
             'asunto' => 'Consulta sobre la carrera',
             'mensaje' => fake()->paragraph(),
-            'horario_preferido' => 'Por la tarde',
             'pagina_origen' => 'http://localhost:3000/carreras/carrera-ejemplo',
             'estado' => 'nueva',
         ];
