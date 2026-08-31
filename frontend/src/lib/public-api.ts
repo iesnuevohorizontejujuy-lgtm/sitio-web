@@ -1,9 +1,9 @@
 /**
- * URL base de la API para uso en Client Components (público).
- * Usa la variable de entorno pública que se expone al navegador.
+ * Las llamadas públicas del navegador pasan por Next.js. De esta forma el
+ * frontend no expone direcciones internas, evita CORS y puede cambiar el CMS
+ * sin tener que recompilar el JavaScript que recibe el visitante.
  */
-export const PUBLIC_API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
+export const PUBLIC_API_URL = "/api/cms";
 
 /**
  * Helper de fetch para endpoints públicos de la API (sin autenticación).

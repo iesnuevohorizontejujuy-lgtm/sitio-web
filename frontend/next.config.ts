@@ -13,6 +13,11 @@ const remotePatterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
     port: "8000",
     pathname: "/storage/**",
   },
+  {
+    protocol: "https",
+    hostname: "sitio.cms.iesnuevohorizonte.com",
+    pathname: "/storage/**",
+  },
 ];
 
 for (const configuredUrl of [process.env.NEXT_PUBLIC_API_URL, process.env.BACKEND_URL]) {
