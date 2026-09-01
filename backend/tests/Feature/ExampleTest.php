@@ -35,6 +35,8 @@ test('the production container enables secure sessions and transport headers', f
     $nginx = file_get_contents(base_path('docker/nginx'));
 
     expect($dockerfile)
+        ->toContain('HEALTHCHECK_HOST=sitio.cms.iesnuevohorizonte.com')
+        ->toContain('--header "Host: ${HEALTHCHECK_HOST}"')
         ->toContain('SESSION_SECURE_COOKIE=true')
         ->toContain('SESSION_HTTP_ONLY=true')
         ->toContain('SESSION_SAME_SITE=lax');
