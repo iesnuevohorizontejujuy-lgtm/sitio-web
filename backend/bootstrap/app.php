@@ -5,6 +5,22 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 
+$trustedProxies = array_values(array_filter(array_map(
+    'trim',
+    explode(',', (string) env(
+        'TRUSTED_PROXIES',
+        '127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16'
+    ))
+)));
+
+$trustedHosts = array_values(array_filter(array_map(
+    'trim',
+    explode(',', (string) env(
+        'TRUSTED_HOSTS',
+        '^sitio\.cms\.iesnuevohorizonte\.com$,^localhost$,^127\.0\.0\.1$'
+    ))
+)));
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -12,8 +28,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->trustProxies(at: '*');
+    ->withMiddleware(function (Middleware $middleware) use ($trustedHosts, $trustedProxies): void {
+        $middleware->trustProxies(at: $trustedProxies);
+        $middleware->trustHosts(at: $trustedHosts, subdomains: false);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

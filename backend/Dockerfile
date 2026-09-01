@@ -5,7 +5,10 @@ FROM php:8.4-fpm-alpine AS php-base
 ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
-    LOG_LEVEL=info
+    LOG_LEVEL=info \
+    SESSION_SECURE_COOKIE=true \
+    SESSION_HTTP_ONLY=true \
+    SESSION_SAME_SITE=lax
 
 RUN set -eux; \
     apk add --no-cache \

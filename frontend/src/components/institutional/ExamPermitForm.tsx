@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   AlertTriangle,
@@ -257,6 +257,7 @@ const previewConfiguration: ExamPermitConfiguration = {
 };
 
 export function ExamPermitForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const previewMode = process.env.NODE_ENV !== "production" && searchParams.get("preview") === "1";
   const returnedPermitToken = searchParams.get("permit");
@@ -631,7 +632,7 @@ export function ExamPermitForm() {
           </div>
         )}
         {failed && (
-          <Button type="button" className="h-12 bg-[#0A496C] hover:bg-[#073A57]" onClick={() => window.location.assign("/permisos-examen")}>
+          <Button type="button" className="h-12 bg-[#0A496C] hover:bg-[#073A57]" onClick={() => router.push("/permisos-examen")}>
             Iniciar una nueva solicitud
           </Button>
         )}
