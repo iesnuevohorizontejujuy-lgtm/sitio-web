@@ -6,7 +6,6 @@ ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
     LOG_LEVEL=info \
-    HEALTHCHECK_HOST=sitio.cms.iesnuevohorizonte.com \
     SESSION_SECURE_COOKIE=true \
     SESSION_HTTP_ONLY=true \
     SESSION_SAME_SITE=lax
@@ -110,9 +109,7 @@ RUN set -eux; \
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD curl --fail --silent --show-error \
-        --header "Host: ${HEALTHCHECK_HOST}" \
-        http://127.0.0.1:80/up || exit 1
+    CMD curl --fail --silent --show-error http://127.0.0.1:80/up || exit 1
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 CMD ["nginx", "-g", "daemon off;"]

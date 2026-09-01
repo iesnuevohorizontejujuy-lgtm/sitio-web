@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Middleware\TrustHosts;
-
 test('the application returns a successful response', function () {
     $response = $this->get('/');
 
@@ -14,32 +12,24 @@ test('the application returns a successful response', function () {
         ->assertSee(route('filament.panel.resources.diapositiva-portadas.index'), escape: false);
 });
 
-test('only the configured cms and local host names are trusted', function () {
-    $trustedHosts = app(TrustHosts::class)->hosts();
-
-    expect($trustedHosts)
-        ->toBe([
-            '^sitio\.cms\.iesnuevohorizonte\.com$',
-            '^localhost$',
-            '^127\.0\.0\.1$',
-        ])
-        ->not->toContain('.*');
-});
-
-test('the production cms host is trusted', function () {
-    $this->withHeader('Host', 'sitio.cms.iesnuevohorizonte.com')->get('/')->assertSuccessful();
+test('the internal container health check is accepted', function () {
+    $this->withHeader('Host', '127.0.0.1')->get('/up')->assertSuccessful();
 });
 
 test('the production container enables secure sessions and transport headers', function () {
     $dockerfile = file_get_contents(base_path('Dockerfile'));
+    $bootstrap = file_get_contents(base_path('bootstrap/app.php'));
     $nginx = file_get_contents(base_path('docker/nginx'));
 
     expect($dockerfile)
-        ->toContain('HEALTHCHECK_HOST=sitio.cms.iesnuevohorizonte.com')
-        ->toContain('--header "Host: ${HEALTHCHECK_HOST}"')
+        ->toContain('http://127.0.0.1:80/up')
         ->toContain('SESSION_SECURE_COOKIE=true')
         ->toContain('SESSION_HTTP_ONLY=true')
         ->toContain('SESSION_SAME_SITE=lax');
+
+    expect($bootstrap)
+        ->toContain('trustProxies')
+        ->not->toContain('trustHosts');
 
     expect($nginx)
         ->toContain('server_tokens off;')

@@ -13,14 +13,6 @@ $trustedProxies = array_values(array_filter(array_map(
     ))
 )));
 
-$trustedHosts = array_values(array_filter(array_map(
-    'trim',
-    explode(',', (string) env(
-        'TRUSTED_HOSTS',
-        '^sitio\.cms\.iesnuevohorizonte\.com$,^localhost$,^127\.0\.0\.1$'
-    ))
-)));
-
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -28,9 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware) use ($trustedHosts, $trustedProxies): void {
+    ->withMiddleware(function (Middleware $middleware) use ($trustedProxies): void {
         $middleware->trustProxies(at: $trustedProxies);
-        $middleware->trustHosts(at: $trustedHosts, subdomains: false);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
