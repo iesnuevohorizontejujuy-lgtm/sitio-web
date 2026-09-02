@@ -15,7 +15,7 @@ export async function getHomepageSlides(): Promise<HomepageSlide[]> {
     if (!response.ok) return [];
 
     const data = (await response.json()) as unknown;
-    return Array.isArray(data) ? data.slice(0, 3) as HomepageSlide[] : [];
+    return Array.isArray(data) ? data.slice(0, 4) as HomepageSlide[] : [];
   } catch {
     return [];
   }

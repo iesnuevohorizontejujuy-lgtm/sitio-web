@@ -15,7 +15,7 @@ class DiapositivaPortadaController extends Controller
             ->vigentes()
             ->orderBy('orden')
             ->orderByDesc('id')
-            ->limit(3)
+            ->limit(4)
             ->get();
 
         return response()->json(DiapositivaPortadaResource::collection($slides)->resolve());

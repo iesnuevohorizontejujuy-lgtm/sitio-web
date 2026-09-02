@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Clock3, FileCheck2, ShieldCheck } from "lucide-react";
+import { ExamPermitEditorialNotice } from "@/components/institutional/ExamPermitEditorialNotice";
 import { ExamPermitForm } from "@/components/institutional/ExamPermitForm";
 import { InstitutionalPageMasthead } from "@/components/institutional/InstitutionalPageMasthead";
 import { InstitutionalPageNav } from "@/components/institutional/InstitutionalPageNav";
 import { InstitutionalSectionHeading } from "@/components/institutional/InstitutionalSectionHeading";
+import { getExamPermitEditorialContent } from "@/lib/exam-permit-content";
 
 export const metadata: Metadata = {
   title: "Permisos de examen",
@@ -18,7 +20,9 @@ const assurances = [
   { icon: Clock3, title: "Confirmación", text: "La ficha se habilita cuando el sistema recibe la acreditación." },
 ] as const;
 
-export default function ExamPermitsPage() {
+export default async function ExamPermitsPage() {
+  const editorialContent = await getExamPermitEditorialContent();
+
   return (
     <main className="institutional-shell">
       <InstitutionalPageMasthead
@@ -51,9 +55,14 @@ export default function ExamPermitsPage() {
           title="Completá el permiso paso a paso"
           description="Los datos de la convocatoria y la oferta de materias se consultan directamente en los sistemas institucionales."
         />
+        {editorialContent ? (
+          <div className="mt-10">
+            <ExamPermitEditorialNotice content={editorialContent} />
+          </div>
+        ) : null}
         <Suspense fallback={<div className="mt-10 rounded-2xl border border-[#D8E1E8] bg-white p-12 text-center text-[#64748B]">Preparando el formulario…</div>}>
           <div className="mt-10">
-          <ExamPermitForm />
+          <ExamPermitForm hasEditorialContent={Boolean(editorialContent)} />
           </div>
         </Suspense>
       </section>

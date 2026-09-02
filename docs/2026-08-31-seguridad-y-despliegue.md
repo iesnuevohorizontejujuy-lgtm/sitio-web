@@ -65,15 +65,11 @@ TRUSTED_PROXIES=127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
 
 Esto permite que Laravel reconozca correctamente HTTPS detrás del proxy, pero evita aceptar encabezados reenviados desde cualquier origen.
 
-### Hosts confiables
+### Validación de hosts
 
-Laravel solamente acepta los hosts configurados:
+La validación `TrustHosts` de Laravel se retiró porque rechazaba con código `400` el chequeo interno que Dokploy realiza contra `127.0.0.1`. Esto provocaba que un contenedor con Nginx y PHP-FPM funcionando fuera marcado como no saludable y terminara respondiendo `502 Bad Gateway` desde el proxy.
 
-```env
-TRUSTED_HOSTS=^sitio\.cms\.iesnuevohorizonte\.com$,^localhost$,^127\.0\.0\.1$
-```
-
-Si el CMS cambia de dominio o se habilita temporalmente otro subdominio, debe agregarse explícitamente a esta variable antes del despliegue.
+El dominio público continúa restringido por la configuración de Traefik de Dokploy, que publica únicamente `sitio.cms.iesnuevohorizonte.com` sobre el puerto `80` del contenedor. Las demás medidas de seguridad permanecen activas.
 
 ### Cookies de sesión
 
@@ -133,10 +129,11 @@ SESSION_SECURE_COOKIE=true
 SESSION_HTTP_ONLY=true
 SESSION_SAME_SITE=lax
 TRUSTED_PROXIES=127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
-TRUSTED_HOSTS=^sitio\.cms\.iesnuevohorizonte\.com$,^localhost$,^127\.0\.0\.1$
 ```
 
 Las variables definidas directamente en Dokploy prevalecen sobre los valores incluidos en el Dockerfile. Después de modificarlas se debe reconstruir la aplicación, no solamente reiniciar el contenedor.
+
+El chequeo interno se conecta directamente a `127.0.0.1:80/up`. La aplicación acepta este endpoint sin aplicar una lista de hosts de Laravel, evitando falsos estados no saludables.
 
 ## Verificaciones realizadas
 
@@ -181,4 +178,3 @@ La construcción final de la imagen Docker no se ejecutó localmente porque el d
 - `backend/config/session.php`
 - `backend/docker/nginx`
 - `backend/tests/Feature/ExampleTest.php`
-

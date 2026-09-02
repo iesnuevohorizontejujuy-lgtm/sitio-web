@@ -4,6 +4,8 @@ use App\Filament\Resources\Autoridads\Pages\ListAutoridads;
 use App\Filament\Resources\AvisoSitios\Pages\ListAvisoSitios;
 use App\Filament\Resources\Carreras\Pages\CreateCarrera;
 use App\Filament\Resources\Carreras\Pages\ListCarreras;
+use App\Filament\Resources\ConfiguracionPermisoExamens\Pages\CreateConfiguracionPermisoExamen;
+use App\Filament\Resources\ConfiguracionPermisoExamens\Pages\ListConfiguracionPermisoExamens;
 use App\Filament\Resources\Consultas\Pages\ListConsultas;
 use App\Filament\Resources\ConvocatoriaIngresos\Pages\ListConvocatoriaIngresos;
 use App\Filament\Resources\DiapositivaPortadas\Pages\CreateDiapositivaPortada;
@@ -13,6 +15,7 @@ use App\Filament\Resources\Noticias\Pages\ListNoticias;
 use App\Models\Autoridad;
 use App\Models\AvisoSitio;
 use App\Models\Carrera;
+use App\Models\ConfiguracionPermisoExamen;
 use App\Models\Consulta;
 use App\Models\ConvocatoriaIngreso;
 use App\Models\DiapositivaPortada;
@@ -117,4 +120,22 @@ it('manages responsive homepage slides in the CMS', function () {
         ->assertFormFieldExists('imagen_alt')
         ->assertFormFieldExists('inicia_at')
         ->assertFormFieldExists('finaliza_at');
+});
+
+it('manages structured exam permit content in the CMS', function () {
+    $contents = ConfiguracionPermisoExamen::factory()->count(2)->create();
+
+    Livewire::test(ListConfiguracionPermisoExamens::class)
+        ->assertCanSeeTableRecords($contents)
+        ->assertTableColumnExists('titulo')
+        ->assertTableColumnExists('publicada')
+        ->assertTableColumnExists('updated_at');
+
+    Livewire::test(CreateConfiguracionPermisoExamen::class)
+        ->assertFormFieldExists('titulo')
+        ->assertFormFieldExists('introduccion')
+        ->assertFormFieldExists('indicaciones')
+        ->assertFormFieldExists('advertencia_titulo')
+        ->assertFormFieldExists('advertencia')
+        ->assertFormFieldExists('publicada');
 });

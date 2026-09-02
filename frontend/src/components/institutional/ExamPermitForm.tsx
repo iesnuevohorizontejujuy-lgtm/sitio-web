@@ -256,7 +256,7 @@ const previewConfiguration: ExamPermitConfiguration = {
   message: "Inscripciones habilitadas para esta demostración.",
 };
 
-export function ExamPermitForm() {
+export function ExamPermitForm({ hasEditorialContent = false }: { hasEditorialContent?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const previewMode = process.env.NODE_ENV !== "production" && searchParams.get("preview") === "1";
@@ -697,7 +697,9 @@ export function ExamPermitForm() {
               Disponible hasta el {formatDateTime(configuration.endsAt)}
               {configuration.durationDays ? ` · Duración: ${configuration.durationDays} días` : ""}
             </p>
-            {configuration.message && <p className="mt-3 text-sm leading-6 text-[#52606D]">{configuration.message}</p>}
+            {!hasEditorialContent && configuration.message ? (
+              <p className="mt-3 whitespace-pre-line text-sm leading-6 text-[#52606D]">{configuration.message}</p>
+            ) : null}
           </div>
           <div className="shrink-0 rounded-xl bg-white px-5 py-4 text-right shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#64748B]">Arancel</p>

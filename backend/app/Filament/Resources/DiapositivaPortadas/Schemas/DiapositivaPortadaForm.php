@@ -26,7 +26,7 @@ class DiapositivaPortadaForm
                     TextInput::make('url_boton_secundario')->label('Destino secundario')->maxLength(1000)->rules(['nullable', 'regex:/^(\/(?!\/)|https?:\/\/)/i'])->placeholder('/ingresantes'),
                 ]),
                 Section::make('Publicación')->columnSpan(1)->schema([
-                    TextInput::make('orden')->numeric()->integer()->minValue(0)->maxValue(99)->default(0)->required()->helperText('0 aparece antes que 1. Se muestran hasta tres diapositivas.'),
+                    TextInput::make('orden')->numeric()->integer()->minValue(0)->maxValue(99)->default(0)->required()->helperText('0 aparece antes que 1. Se muestran hasta cuatro diapositivas.'),
                     Toggle::make('publicada')->label('Publicar en el inicio')->default(false),
                     DateTimePicker::make('inicia_at')->label('Mostrar desde')->native(false)->seconds(false),
                     DateTimePicker::make('finaliza_at')->label('Mostrar hasta')->native(false)->seconds(false)->afterOrEqual('inicia_at'),

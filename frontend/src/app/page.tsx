@@ -19,7 +19,7 @@ import { HomeNewsEditorial } from "@/components/institutional/HomeNewsEditorial"
 import { formatAdmissionDate, getAdmissionCall } from "@/lib/admissions";
 import { getCareers } from "@/lib/careers";
 import { getHomepageSlides } from "@/lib/homepage-slides";
-import { getInstitutionalNews, stripInstitutionalHtml } from "@/lib/institutional-news";
+import { getInstitutionalNews } from "@/lib/institutional-news";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -49,62 +49,54 @@ export default async function HomePage() {
     getHomepageSlides(),
   ]);
   const latestInstitutionalNews = institutionalNews.noticias.slice(0, 4);
-  const featuredNews = institutionalNews.destacadas.find((item) => item.imagen_principal)
-    ?? latestInstitutionalNews.find((item) => item.imagen_principal);
   const fallbackHeroSlides: HomeHeroSlide[] = [
     {
-      id: "futuro-profesional",
-      eyebrow: "Educación superior en Jujuy",
-      title: "Tu futuro profesional comienza acá",
-      description: "Formación superior cercana, práctica y comprometida con las oportunidades profesionales de nuestra provincia.",
-      image: "/herosection.webp",
-      imageAlt: "Estudiantes proyectando su futuro profesional",
+      id: "instituto-frente",
+      eyebrow: "IES Nuevo Horizonte · Jujuy",
+      title: "Una institución para construir tu futuro",
+      description: "Conocé nuestros espacios, nuestra propuesta académica y una comunidad que acompaña cada trayectoria.",
+      image: "/institutional/instituto-frente.jpeg",
+      imageAlt: "Frente del Instituto de Educación Superior Nuevo Horizonte en San Salvador de Jujuy",
+      primaryLabel: "Conocé el instituto",
+      primaryHref: "/institucion",
+      secondaryLabel: "Explorar carreras",
+      secondaryHref: "/carreras",
+    },
+    {
+      id: "instituto-patio",
+      eyebrow: "Espacios que acompañan",
+      title: "Un lugar para aprender, encontrarse y crecer",
+      description: "Aulas y espacios comunes pensados para compartir experiencias y avanzar en tu formación profesional.",
+      image: "/institutional/instituto-patio.jpeg",
+      imageAlt: "Patio interior y espacios comunes del IES Nuevo Horizonte",
+      primaryLabel: "Recorré la institución",
+      primaryHref: "/institucion",
+      secondaryLabel: "Cómo llegar",
+      secondaryHref: "/institucion#ubicacion",
+    },
+    {
+      id: "comunidad-patio-uno",
+      eyebrow: "Comunidad educativa",
+      title: "Aprender también es encontrarse y compartir",
+      description: "La vida institucional se construye con participación, acompañamiento y experiencias que van más allá del aula.",
+      image: "/institutional/comunidad-patio-1.jpeg",
+      imageAlt: "Estudiantes del IES Nuevo Horizonte compartiendo una actividad en el patio",
+      primaryLabel: "Vida institucional",
+      primaryHref: "/vida-institucional",
+      secondaryLabel: "Noticias y actividades",
+      secondaryHref: "/noticias",
+    },
+    {
+      id: "comunidad-patio-dos",
+      eyebrow: "Educación cercana",
+      title: "Formación con acompañamiento y oportunidades reales",
+      description: "Estudiantes y docentes forman una comunidad comprometida con el crecimiento profesional en Jujuy.",
+      image: "/institutional/comunidad-patio-2.jpeg",
+      imageAlt: "Comunidad estudiantil reunida en los espacios abiertos del IES Nuevo Horizonte",
       primaryLabel: "Conocé nuestras carreras",
       primaryHref: "/carreras",
-      secondaryLabel: "Cómo inscribirme",
+      secondaryLabel: "Información para ingresantes",
       secondaryHref: "/ingresantes",
-    },
-    admissionCall ? {
-      id: "ingreso",
-      eyebrow: admissionCall.estado === "abiertas" ? "Inscripciones abiertas" : admissionCall.estado === "cerradas" ? "Información de ingreso" : "Próximo ingreso",
-      title: admissionCall.titulo,
-      description: admissionCall.bajada ?? "Encontrá los requisitos, la documentación y las fechas para comenzar tu carrera en el instituto.",
-      image: "/instituto.jpg",
-      imageAlt: "Aula de informática del IES Nuevo Horizonte",
-      primaryLabel: "Ver información de ingreso",
-      primaryHref: "/ingresantes",
-      secondaryLabel: "Consultar carreras",
-      secondaryHref: "/carreras",
-    } : {
-      id: "oferta-academica",
-      eyebrow: "20 carreras",
-      title: "Encontrá una carrera para transformar tu vocación",
-      description: "Conocé la duración, el perfil profesional y el plan de estudios de cada tecnicatura.",
-      image: "/institutional/software-students.png",
-      imageAlt: "Estudiantes trabajando en equipo durante una actividad académica",
-      primaryLabel: "Explorar la oferta académica",
-      primaryHref: "/carreras",
-    },
-    featuredNews ? {
-      id: `noticia-${featuredNews.id}`,
-      eyebrow: "Vida institucional",
-      title: featuredNews.titulo,
-      description: stripInstitutionalHtml(featuredNews.contenido).slice(0, 180) || "Conocé las actividades y novedades de nuestra comunidad educativa.",
-      image: featuredNews.imagen_principal!,
-      imageAlt: featuredNews.titulo,
-      primaryLabel: "Leer la noticia",
-      primaryHref: `/vida-institucional/${featuredNews.slug}`,
-      secondaryLabel: "Ver todas las novedades",
-      secondaryHref: "/vida-institucional",
-    } : {
-      id: "comunidad",
-      eyebrow: "Comunidad educativa",
-      title: "Aprender también es participar, crear y compartir",
-      description: "Prácticas, jornadas y actividades que conectan la formación con la vida profesional.",
-      image: "/instituto.jpg",
-      imageAlt: "Espacios de formación del IES Nuevo Horizonte",
-      primaryLabel: "Conocé la vida institucional",
-      primaryHref: "/vida-institucional",
     },
   ];
   const heroSlides: HomeHeroSlide[] = managedHomepageSlides.length > 0
